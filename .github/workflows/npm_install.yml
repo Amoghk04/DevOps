@@ -18,6 +18,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: escapeverse
 
       - name: Build the app
         run: npm run build
+        working-directory: escapeverse
