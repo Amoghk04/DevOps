@@ -1,10 +1,13 @@
-// src/AuthForm.jsx
 import { useState } from "react";
 import { auth } from "./firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInAnonymously, // <-- Add this
 } from "firebase/auth";
+import googleLogo from "./assets/google.webp";
 
 export default function AuthForm() {
   const [email, setEmail] = useState("");
@@ -21,6 +24,25 @@ export default function AuthForm() {
         await createUserWithEmailAndPassword(auth, email, password);
       }
       alert("Success!");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      alert("Logged in with Google!");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleGuestAuth = async () => {
+    try {
+      await signInAnonymously(auth);
+      alert("You’re now logged in as a Guest!");
     } catch (err) {
       setError(err.message);
     }
@@ -49,8 +71,23 @@ export default function AuthForm() {
       >
         {isLogin ? "Login" : "Sign Up"}
       </button>
+      <button
+        onClick={handleGoogleAuth}
+        className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+      >
+        <img src={googleLogo} alt="Google" className="w-5 h-5" />
+        <span className="text-sm text-gray-700 dark:text-gray-200">
+          Sign in with Google
+        </span>
+      </button>
+      <button
+        onClick={handleGuestAuth}
+        className="w-full py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+      >
+        Continue as Guest
+      </button>
       <p
-        className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer underline"
+        className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer underline text-center"
         onClick={() => setIsLogin(!isLogin)}
       >
         {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
