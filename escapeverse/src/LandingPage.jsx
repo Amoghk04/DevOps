@@ -5,12 +5,14 @@ import { signOut } from "firebase/auth";
 import { useEffect, useState, useRef } from "react";
 import { Moon, Sun, LogOut, UserCircle2, Instagram, Menu, ChevronLeft, ChevronRight, Heart, Users, Code } from "lucide-react";
 import { Link } from "react-router-dom";
+import ProfileOverlay from "./ProfileOverlay";
 
 export default function LandingPage() {
   const { user } = useUser();
   const [dark, setDark] = useState(false);
   const [points, setPoints] = useState(0);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
   const sidebarRef = useRef(null);
 
   // Toggle dark mode based on state.
@@ -52,14 +54,14 @@ export default function LandingPage() {
     <div className="min-h-screen w-full flex flex-col">
       {/* Main container with new softer color scheme */}
       <div className="flex-grow flex bg-gradient-to-r from-sky-400 via-blue-500 to-teal-500 dark:from-blue-900 dark:via-teal-900 dark:to-slate-800 overflow-hidden">
-        
+
         {/* Expandable Sidebar */}
-        <aside 
+        <aside
           ref={sidebarRef}
           className={`${sidebarExpanded ? 'w-72' : 'w-20'} h-screen bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg transition-all duration-300 ease-in-out z-40 relative`}
         >
           {/* Toggle Button */}
-          <button 
+          <button
             onClick={toggleSidebar}
             className="absolute -right-4 top-10 p-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-500 dark:from-blue-600 dark:to-teal-600 text-white shadow-lg hover:shadow-blue-400/50 dark:hover:shadow-blue-600/50"
           >
@@ -73,10 +75,16 @@ export default function LandingPage() {
               </h2>
 
               <nav className="flex flex-col gap-8">
-                <div className={`flex items-center gap-3 text-gray-600 dark:text-gray-300 ${!sidebarExpanded && 'justify-center'}`}>
-                  <UserCircle2 size={24} className="text-blue-500 dark:text-blue-400" />
-                  {sidebarExpanded && <span className="font-medium">Profile</span>}
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setShowProfile(true)}
+                    className={`flex items-center gap-3 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 ${!sidebarExpanded ? 'justify-center w-full' : ''}`}
+                  >
+                    <UserCircle2 size={24} className="text-blue-500 dark:text-blue-400" />
+                    {sidebarExpanded && <span className="font-medium">Profile</span>}
+                  </button>
                 </div>
+
 
                 <div className={`flex items-center gap-3 text-gray-600 dark:text-gray-300 ${!sidebarExpanded && 'justify-center'}`}>
                   <Menu size={24} className="text-blue-500 dark:text-blue-400" />
@@ -142,8 +150,8 @@ export default function LandingPage() {
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-8 group-hover:text-blue-900 dark:group-hover:text-blue-300 transition-colors duration-300">
                 Create your own immersive escape room experience. Design puzzles, set themes, and invite friends.
               </p>
-              <Link 
-                to="/create-room" 
+              <Link
+                to="/create-room"
                 className="block p-5 bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 rounded-2xl text-white text-center font-bold shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-700/50 transition-all duration-300"
               >
                 Create Room
@@ -158,8 +166,8 @@ export default function LandingPage() {
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-8 group-hover:text-teal-900 dark:group-hover:text-teal-300 transition-colors duration-300">
                 Connect and join existing rooms. Enter a room code or select from available public rooms.
               </p>
-              <Link 
-                to="/join-room" 
+              <Link
+                to="/join-room"
                 className="block p-5 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 rounded-2xl text-white text-center font-bold shadow-lg hover:shadow-teal-500/50 dark:hover:shadow-teal-700/50 transition-all duration-300"
               >
                 Join Room
@@ -219,7 +227,7 @@ export default function LandingPage() {
                     8 Active Rooms
                   </span>
                 </div>
-                
+
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-white/60 dark:bg-gray-900/60 p-4 rounded-xl flex items-center justify-between group-hover:scale-105 transition-transform">
                     <div>
@@ -230,7 +238,7 @@ export default function LandingPage() {
                       Watch
                     </button>
                   </div>
-                  
+
                   <div className="bg-white/60 dark:bg-gray-900/60 p-4 rounded-xl flex items-center justify-between group-hover:scale-105 transition-transform">
                     <div>
                       <p className="font-medium text-blue-800 dark:text-blue-300">Ancient Temple</p>
@@ -245,6 +253,7 @@ export default function LandingPage() {
             </div>
           </section>
         </main>
+        {showProfile && <ProfileOverlay onClose={() => setShowProfile(false)} />}
       </div>
 
       {/* Static Footer for Contributions */}
@@ -255,21 +264,21 @@ export default function LandingPage() {
               <Heart size={20} className="text-blue-500 dark:text-blue-400" />
               <span className="text-gray-700 dark:text-gray-300 font-medium">Contributors: 24 developers from 8 countries</span>
             </div>
-            
+
             <div className="flex gap-6">
               <div className="flex items-center gap-2">
                 <Code size={18} className="text-teal-600 dark:text-teal-500" />
                 <span className="text-gray-700 dark:text-gray-300">342 commits</span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Users size={18} className="text-cyan-600 dark:text-cyan-500" />
                 <span className="text-gray-700 dark:text-gray-300">16 active contributors</span>
               </div>
-              
-              <a 
-                href="https://github.com/escapeverse/project" 
-                target="_blank" 
+
+              <a
+                href="https://github.com/escapeverse/project"
+                target="_blank"
                 rel="noreferrer"
                 className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
