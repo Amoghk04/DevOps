@@ -1,22 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useUser } from './UserContext';
 import './App.css';
 import AuthForm from './AuthForm';
 import LandingPage from './LandingPage';
-import { Sun, Moon } from 'lucide-react';
-import { useUser } from './UserContext';
 
 function App() {
-  const [dark, setDark] = useState(false);
   const { user, loading } = useUser();
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark);
-  }, [dark]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 text-gray-800 dark:text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#1a1a1a] text-white">
         Loading...
       </div>
     );
@@ -24,26 +17,31 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-blue-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:to-gray-800 relative">
+      <div
+        className="min-h-screen w-full flex items-center justify-end relative px-10"
+        style={{
+          backgroundImage: 'url(/bg1.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#1a1a1a', // fallback in case image doesn't load
+        }}
+      >
+        {/* Dark overlay on top of the background */}
+        {/* You can adjust opacity to control how dark the background becomes */}
+        <div className="absolute inset-0 bg-black opacity-0 z-0" />
+        {/* ↑ 50% darkness — try 0.3 for lighter, or 0.7 for darker */}
+
         <Routes>
           <Route
             path="/"
             element={
               !user ? (
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-md w-full max-w-md">
-                  {/* Toggle Theme Button */}
-                  <button
-                    onClick={() => setDark(!dark)}
-                    className="absolute top-4 right-4 p-2 rounded-full bg-white dark:bg-gray-800 shadow hover:scale-105 transition-transform"
-                    aria-label="Toggle Theme"
-                  >
-                    {dark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-blue-600" />}
-                  </button>
-                  <h1 className="text-2xl font-bold text-center mb-4 text-gray-900 dark:text-white">
-                    Welcome to Escapeverse
-                  </h1>
-                  <p className="text-sm text-center text-gray-600 dark:text-gray-300 mb-6">
-                    Please log in to continue to your account.
+                <div
+                  className="relative z-10 bg-black/60 p-8 rounded-xl shadow-2xl w-full max-w-md text-white custom-margin"
+                >
+                  <p className="text-2xl font-bold text-center mb-4 text-yellow-300">
+                    Log in to continue your Journey.
                   </p>
                   <AuthForm />
                 </div>
@@ -52,7 +50,6 @@ function App() {
               )
             }
           />
-
           <Route
             path="/home"
             element={user ? <LandingPage /> : <Navigate to="/" />}
