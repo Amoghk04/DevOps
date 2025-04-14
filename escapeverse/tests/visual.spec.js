@@ -22,9 +22,6 @@ test('LandingPage visual test', async ({ page }) => {
   // Wait for the main container first
   await page.waitForSelector('.min-h-screen', { timeout: 30000 });
   
-  // Use a more specific selector for the sidebar with a class attribute
-  await page.waitForSelector('div[class*="flex-grow flex"]', { timeout: 30000 });
-  
   // Take a screenshot of light mode (without waiting for aside)
   await expect(page).toHaveScreenshot('landing-page-light.png');
   
