@@ -21,13 +21,21 @@ export default function LandingPage() {
   }, [dark]);
 
   // Fetch user points from backend (Flask & MongoDB)
+  // Fetch user points from backend (Flask & MongoDB)
   useEffect(() => {
-    if (user?.uid) {
-      fetch(`/api/get_user_points?uid=${user.uid}`)
-        .then((res) => res.json())
-        .then((data) => setPoints(data.points || 0))
-        .catch((err) => console.error("Failed to fetch points:", err));
-    }
+    const fetchUserPoints = async () => {
+      if (!user?.uid) return;
+      
+      try {
+        const response = await fetch(`/api/get_user_points?uid=${user.uid}`);
+        const data = await response.json();
+        setPoints(data.points || 0);
+      } catch (err) {
+        console.error("Failed to fetch points:", err);
+      }
+    };
+
+    fetchUserPoints();
   }, [user]);
 
   const handleSignOut = async () => {
@@ -63,6 +71,7 @@ export default function LandingPage() {
           {/* Toggle Button */}
           <button
             onClick={toggleSidebar}
+            aria-label={sidebarExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
             className="absolute -right-4 top-10 p-2 rounded-full bg-gradient-to-r from-blue-500 to-teal-500 dark:from-blue-600 dark:to-teal-600 text-white shadow-lg hover:shadow-blue-400/50 dark:hover:shadow-blue-600/50"
           >
             {sidebarExpanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
@@ -98,10 +107,10 @@ export default function LandingPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Connect</p>
               )}
               <div className={`flex gap-4 ${!sidebarExpanded && 'justify-center'}`}>
-                <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:scale-125 transition-transform">
+              <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="Visit us on Github" className="hover:scale-125 transition-transform">
                   Github
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:scale-125 transition-transform">
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Visit us on Instagram" className="hover:scale-125 transition-transform">
                   <Instagram size={24} className="text-teal-600 dark:text-teal-400" />
                 </a>
               </div>
