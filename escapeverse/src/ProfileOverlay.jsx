@@ -1,13 +1,13 @@
 import { useUser } from "./UserContext";
 import { X } from "lucide-react";
-import { motion } from "framer-motion";
+import { _motion } from "framer-motion";
 
 export default function ProfileOverlay({ onClose }) {
   const { user } = useUser();
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-      <motion.div
+      <_motion.div
         initial={{ rotateY: 90, opacity: 0 }}
         animate={{ rotateY: 0, opacity: 1 }}
         exit={{ rotateY: -90, opacity: 0 }}
@@ -36,7 +36,7 @@ export default function ProfileOverlay({ onClose }) {
             <p className="text-xs text-gray-600 break-all dark:text-gray-300">{user?.uid}</p>
           </div>
         </div>
-      </motion.div>
+      </_motion.div>
     </div>
   );
 }

@@ -1,4 +1,7 @@
 // jest.config.js
+
+/* eslint-disable no-undef */
+
 export default {
     testEnvironment: "jsdom",
     setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
