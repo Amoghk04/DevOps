@@ -1,6 +1,5 @@
 // src/LandingPage.test.jsx
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { UserContext } from './UserContext';
 import LandingPage from './LandingPage';
