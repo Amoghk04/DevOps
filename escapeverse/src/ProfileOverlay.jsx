@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function ProfileOverlay({ onClose }) {
   const { user } = useUser();
-
+  motion;
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
       <motion.div
