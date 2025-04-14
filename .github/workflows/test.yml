@@ -119,6 +119,7 @@ jobs:
         run: npx playwright install --with-deps
       - name: Run responsive tests
         run: |
-          npx playwright test --project=desktop
-          npx playwright test --project=tablet
-          npx playwright test --project=mobile
+          npx playwright test --project=Desktop Chrome
+          npx playwright test --project=Desktop Firefox
+          npx playwright test --project=Tablet
+          npx playwright test --project=Mobile
