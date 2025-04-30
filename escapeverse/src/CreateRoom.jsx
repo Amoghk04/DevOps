@@ -2,11 +2,14 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid"; // install with `npm install uuid`
 
-
 function CreateRoom() {
     const handleStartRoom = (themeKey) => {
         const roomId = uuidv4();
-        navigate(`/room/${roomId}?theme=${themeKey}`);
+        // Make it very explicit that this user is the creator/host
+        console.log("Creating room as host");
+        localStorage.setItem("isRoomHost", "true");
+        localStorage.setItem("roomHostId", roomId);
+        navigate(`/room/${roomId}?theme=${themeKey}&creator=true`);
     };
     
     const navigate = useNavigate();
@@ -18,7 +21,6 @@ function CreateRoom() {
                 "Hack into the system, decode digital puzzles, and escape a high-security tech lab.",
             gradient: "from-cyan-500 to-blue-500",
             darkShadow: "dark:hover:shadow-cyan-500/40",
-            to: "/create-room/tech",
             key: "tech",
         },
         {
@@ -27,7 +29,6 @@ function CreateRoom() {
                 "Solve riddles of the pharaohs and unlock the mysteries of the pyramid.",
             gradient: "from-yellow-500 to-orange-500",
             darkShadow: "dark:hover:shadow-yellow-500/40",
-            to: "/create-room/tomb",
             key: "mystery",
         },
         {
@@ -36,7 +37,6 @@ function CreateRoom() {
                 "Unravel the secrets of a haunted estate filled with eerie clues.",
             gradient: "from-purple-500 to-indigo-500",
             darkShadow: "dark:hover:shadow-purple-500/40",
-            to: "/create-room/haunted",
             key: "horror",
         },
     ];
@@ -73,12 +73,11 @@ function CreateRoom() {
                             {theme.description}
                         </p>
                         <button
-                            onClick={() => handleStartRoom(theme.key)} // add `key` in theme objects
+                            onClick={() => handleStartRoom(theme.key)}
                             className={`block w-full p-4 bg-gradient-to-r ${theme.gradient} hover:brightness-110 rounded-xl text-white text-center font-semibold shadow-md transition-all duration-300`}
                         >
-                            Start Room
+                            Create Room
                         </button>
-
                     </div>
                 ))}
             </div>
