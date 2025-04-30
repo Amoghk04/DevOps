@@ -3,6 +3,9 @@ import { useUser } from './UserContext';
 import './App.css';
 import AuthForm from './AuthForm';
 import LandingPage from './LandingPage';
+import CreateRoom from './CreateRoom';
+import RoomLobby from './RoomLobby';
+import JoinRoom from './JoinRoom';
 
 function App() {
   const { user, loading } = useUser();
@@ -29,7 +32,7 @@ function App() {
       >
         {/* Dark overlay on top of the background */}
         {/* You can adjust opacity to control how dark the background becomes */}
-        <div className="absolute inset-0 bg-black opacity-0 z-0" />
+        <div className="absolute inset-0 bg-black opacity-0 pointer-events-none z-0" />
         {/* ↑ 50% darkness — try 0.3 for lighter, or 0.7 for darker */}
 
         <Routes>
@@ -54,6 +57,10 @@ function App() {
             path="/home"
             element={user ? <LandingPage /> : <Navigate to="/" />}
           />
+          <Route path="/create-room" element={<CreateRoom />} />
+          <Route path="/room/:roomId" element={<RoomLobby />} />
+          <Route path="/join-room" element={<JoinRoom />} />
+
         </Routes>
       </div>
     </Router>
