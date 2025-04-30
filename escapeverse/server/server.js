@@ -18,22 +18,44 @@ const rooms = {};
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.on("join-room", ({ roomId }) => {
-    socket.join(roomId);
-    rooms[roomId] = rooms[roomId] || [];
-    rooms[roomId].push({ id: socket.id, username: `Player-${socket.id.slice(-4)}` });
+  socket.on("join-room", ({ roomId, username }) => {
+    const player = {
+      id: socket.id,
+      username: username || `Player-${Math.floor(Math.random() * 1000)}`,
+    };
 
-    io.to(roomId).emit("room-players", rooms[roomId]);
+    // add player to room's player list
+    rooms[roomId] = rooms[roomId] || [];
+    rooms[roomId].push(player);
+
+    // Join the socket room
+    socket.join(roomId);
+    
+    // First, immediately emit back to the sender so they see themselves
+    socket.emit("room-players", rooms[roomId]);
+    
+    // Then emit to everyone else in the room
+    socket.to(roomId).emit("room-players", rooms[roomId]);
   });
 
   socket.on("start-game", ({ roomId }) => {
     io.to(roomId).emit("start-game");
   });
 
+  socket.on("leave-room", (roomId) => {
+    if (rooms[roomId]) {
+      rooms[roomId] = rooms[roomId].filter((p) => p.id !== socket.id);
+      socket.leave(roomId);
+      io.to(roomId).emit("room-players", rooms[roomId]);
+    }
+  });
+
   socket.on("disconnect", () => {
     for (const roomId in rooms) {
-      rooms[roomId] = rooms[roomId].filter((p) => p.id !== socket.id);
-      io.to(roomId).emit("room-players", rooms[roomId]);
+      if (rooms[roomId]) {
+        rooms[roomId] = rooms[roomId].filter((p) => p.id !== socket.id);
+        io.to(roomId).emit("room-players", rooms[roomId]);
+      }
     }
   });
 });

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function JoinRoom() {
   const [roomCode, setRoomCode] = useState("");
-  const [theme, setTheme] = useState("general"); // or fetch theme from backend if needed
+  const [theme, setTheme] = useState("theme"); // or fetch theme from backend if needed
   const navigate = useNavigate();
 
   const handleJoin = () => {
