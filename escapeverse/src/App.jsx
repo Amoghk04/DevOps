@@ -6,6 +6,7 @@ import LandingPage from './LandingPage';
 import CreateRoom from './CreateRoom';
 import RoomLobby from './RoomLobby';
 import JoinRoom from './JoinRoom';
+import Gates from './Gates';
 
 function App() {
   const { user, loading } = useUser();
@@ -60,7 +61,8 @@ function App() {
           <Route path="/create-room" element={<CreateRoom />} />
           <Route path="/room/:roomId" element={<RoomLobby />} />
           <Route path="/join-room" element={<JoinRoom />} />
-
+          {/* game rooms */}
+          <Route path="/game/:roomId/tech" element={<Gates />} />
         </Routes>
       </div>
     </Router>

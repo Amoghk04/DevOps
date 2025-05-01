@@ -32,7 +32,8 @@ io.on("connection", (socket) => {
       console.log(`Creating new room ${roomId} with host ${socket.id}`);
       rooms[roomId] = {
         players: [],
-        hostId: isCreator ? socket.id : null
+        hostId: isCreator ? socket.id : null,
+        theme: "theme" // Default theme
       };
     }
 
@@ -61,14 +62,21 @@ io.on("connection", (socket) => {
     socket.emit("host-status", socket.id === rooms[roomId].hostId);
   });
 
-  socket.on("start-game", ({ roomId }) => {
+  socket.on("start-game", ({ roomId, theme }) => {
     console.log(`Attempt to start game in room ${roomId} by socket ${socket.id}`);
     console.log(`Room host is: ${rooms[roomId]?.hostId}`);
     
     // Only allow the host to start the game
     if (rooms[roomId] && rooms[roomId].hostId === socket.id) {
-      console.log(`Game started in room ${roomId} by host ${socket.id}`);
-      io.to(roomId).emit("start-game");
+      console.log(`Game started in room ${roomId} by host ${socket.id} with theme ${theme}`);
+      
+      // Store the theme with the room
+      if (theme) {
+        rooms[roomId].theme = theme;
+      }
+      
+      // Broadcast start-game with theme information to all clients in the room
+      io.to(roomId).emit("start-game", { theme: theme || rooms[roomId].theme });
     } else {
       console.log(`Non-host ${socket.id} attempted to start game in room ${roomId}`);
     }
@@ -97,6 +105,9 @@ function handlePlayerLeave(socket, roomId) {
   if (rooms[roomId].hostId === socket.id && rooms[roomId].players.length > 0) {
     rooms[roomId].hostId = rooms[roomId].players[0].id;
     console.log(`New host assigned: ${rooms[roomId].hostId}`);
+    
+    // Inform the new host
+    io.to(rooms[roomId].hostId).emit("host-status", true);
   }
   
   // If room is empty, clean it up

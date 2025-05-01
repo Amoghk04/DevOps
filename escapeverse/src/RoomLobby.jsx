@@ -6,7 +6,8 @@ import { UserContext } from "./UserContext"; // Import your UserContext
 function RoomLobby() {
   const { roomId } = useParams();
   const [searchParams] = useSearchParams();
-  const theme = searchParams.get("theme");
+  // Get the actual theme value - this should be specific (tech, mystery, horror)
+  const theme = searchParams.get("theme") || "tech"; // Default to "tech" if not provided
   const [players, setPlayers] = useState([]);
   const [isHost, setIsHost] = useState(false);
   const [hostId, setHostId] = useState(null);
@@ -41,8 +42,10 @@ function RoomLobby() {
       }
     });
 
-    socketRef.current.on("start-game", () => {
-      navigate(`/game/${roomId}?theme=${theme}`);
+    socketRef.current.on("start-game", (gameData) => {
+      const gameTheme = gameData?.theme || theme;
+      console.log("Received start-game event, navigating to:", `/game/${roomId}/${gameTheme}`);
+      navigate(`/game/${roomId}/${gameTheme}`);
     });
 
     socketRef.current.on("host-status", (isUserHost) => {
@@ -56,8 +59,8 @@ function RoomLobby() {
       
       // Check if user is creator - either from URL or localStorage
       const isCreator = searchParams.has("creator") || 
-                        localStorage.getItem("isRoomHost") === "true" &&
-                        localStorage.getItem("roomHostId") === roomId;
+                        (localStorage.getItem("isRoomHost") === "true" &&
+                        localStorage.getItem("roomHostId") === roomId);
       
       console.log("Is creator?", isCreator);
       
@@ -94,7 +97,7 @@ function RoomLobby() {
   const handleStartGame = () => {
     console.log("Attempting to start game. Is host:", isHost);
     if (isHost) {
-      socketRef.current.emit("start-game", { roomId });
+      socketRef.current.emit("start-game", { roomId, theme });
     }
   };
 

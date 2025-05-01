@@ -8,8 +8,8 @@ function JoinRoom() {
 
   const handleJoin = () => {
     if (roomCode.trim()) {
-      // When joining via code, we don't add the creator flag
-      navigate(`/room/${roomCode}?theme=theme`);
+      // When joining via code, we pass a specific theme parameter (should match host's theme)
+      navigate(`/room/${roomCode}?theme=tech`);
     } else {
       setError("Please enter a valid room code");
     }
@@ -34,6 +34,11 @@ function JoinRoom() {
           setError("");
         }}
         className="w-full p-2 rounded mb-4 text-black"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleJoin();
+          }
+        }}
       />
       
       <button
