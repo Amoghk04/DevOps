@@ -4,20 +4,20 @@ import InteractiveImageMap from './InteractiveImageMap';
 const TypewriterText = ({ text, onComplete, className }) => {
   const [displayText, setDisplayText] = useState('');
   const index = useRef(0);
-  
+
   useEffect(() => {
     if (index.current < text.length) {
       const typingTimer = setTimeout(() => {
         setDisplayText(prev => prev + text[index.current]);
         index.current += 1;
       }, 40); // Typing speed - adjust as needed
-      
+
       return () => clearTimeout(typingTimer);
     } else if (onComplete) {
       onComplete();
     }
   }, [displayText, text, onComplete]);
-  
+
   return <span className={className}>{displayText}</span>;
 };
 
@@ -28,11 +28,17 @@ const Gates = () => {
   const [showLeverMessage, setShowLeverMessage] = useState(false);
   const [typingComplete, setTypingComplete] = useState(false);
   const [statusText, setStatusText] = useState('');
-  
+  const [isDark, setIsDark] = useState(true); // true = torch mode
+  const [showInputOverlay, setShowInputOverlay] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [shake, setShake] = useState(false);
+
+
   // Create a ref for handling outside clicks
   const overlayRef = useRef(null);
   const keypadRef = useRef(null);
-  
+
   // Define interactive areas with their coordinates and handlers
   const areas = [
     {
@@ -40,10 +46,9 @@ const Gates = () => {
       coords: "622,271,686,271,684,461,671,466,667,490,595,492,579,488,581,468,588,448,603,441,623,436,623,359",
       onClick: (area) => {
         console.log('Lever clicked!', area);
-        setShowLeverMessage(true);
-        setTypingComplete(false);
-        setStatusText('');
-        
+        setShowInputOverlay(true);
+        setUserInput('');
+
         // Reset the lever activation after message disappears
         setTimeout(() => {
           setShowLeverMessage(false);
@@ -63,29 +68,40 @@ const Gates = () => {
   // Add event listener for clicks outside the overlays
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Handle lever message overlay
-      if (showLeverMessage && 
-          overlayRef.current && 
-          !overlayRef.current.contains(event.target)) {
-        setShowLeverMessage(false);
-      }
-      
+      console.log("Even");
+      console.log("event.target:", event.target); // Log the clicked target element
+      console.log("keypadRef.current:", keypadRef.current); // Log keypad reference
+      console.log("overlayRef.current:", overlayRef.current); // Log overlay reference
+  
       // Handle keypad overlay
-      if (keypadActivated && 
-          keypadRef.current && 
-          !keypadRef.current.contains(event.target)) {
+      if (keypadActivated && keypadRef.current && !keypadRef.current.contains(event.target)) {
+        console.log("Click is outside the keypad, deactivating keypad.");
         setKeypadActivated(false);
       }
+  
+      // Hide the lever input overlay when clicked outside
+      if (showInputOverlay && overlayRef.current && !overlayRef.current.contains(event.target)) {
+        console.log("Click is outside the input overlay, hiding it.");
+        setShowInputOverlay(false);
+      }
     };
-    
+  
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+  
     // Add the event listener
     document.addEventListener('mousedown', handleClickOutside);
-    
+    document.addEventListener('mousemove', handleMouseMove);
+  
     // Cleanup the event listener
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [showLeverMessage, keypadActivated]);
+  }, [showLeverMessage, keypadActivated, showInputOverlay]);
+  
+  
 
   // Handle keypad input
   const handlePinInput = (digit) => {
@@ -123,42 +139,70 @@ const Gates = () => {
 
   return (
     <div className="relative">
-      <InteractiveImageMap 
-        imageSrc="/door-finale.png"
-        areas={areas}
-        fullscreenOnMount={true}
-        showDebug={true}
-      />
-      
+      <div className="relative z-0">
+        <InteractiveImageMap
+          imageSrc="/door-finale.png"
+          areas={areas}
+          fullscreenOnMount={true}
+          showDebug={true}
+        />
+
+        {/* Torchlight overlay */}
+        {isDark && (
+          <div
+            className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
+            style={{
+              background: `radial-gradient(circle 100px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.95) 100%)`,
+              transition: 'background-position 0.05s ease-out',
+            }}
+          ></div>
+        )}
+      </div>
+
       {/* Tech-styled text overlay at bottom center when lever is activated */}
-      {showLeverMessage && (
-        <div 
-          ref={overlayRef}
-          className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-green-400 p-4 rounded-lg border border-green-500 shadow-lg min-w-80 text-center"
+      {showInputOverlay && (
+        <div
+          
+          className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono"
+          onClick={(e) => e.stopPropagation()} // prevent bubbling
         >
-          <div className="font-mono tracking-wider text-lg uppercase">
-            <span className="text-xs mr-2">[SYS]</span>
-            <TypewriterText 
-              text="LEVER MECHANISM ACTIVATED" 
-              onComplete={handleTypingComplete}
-              className=""
-            />
+          <div ref={overlayRef} className="bg-black p-6 rounded-lg border-4 border-white w-96">
+            {isDark ? (
+              <>
+                <div className="mb-4 text-xl">Enter the command to lift the darkness:</div>
+                <input
+                  type="text"
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  className={`p-2 rounded text-black transition-transform ${shake ? 'animate-shake' : ''} border-2 border-white`}
+                  placeholder="Type here..."
+                />
+                <button
+                  onClick={() => {
+                    if (userInput.toLowerCase().trim() === 'light') {
+                      setIsDark(false);
+                      setShowInputOverlay(false);
+                    } else {
+                      setShake(true);
+                      setTimeout(() => setShake(false), 500);
+                      setUserInput('');
+                    }
+                  }}
+                  className="mt-2 px-4 py-2 bg-green-600 rounded hover:bg-green-700"
+                >
+                  Submit
+                </button>
+              </>
+            ) : (
+              <div className="text-xl">Light is already on!</div>
+            )}
           </div>
-          {typingComplete && (
-            <div className="font-mono text-sm mt-1 text-green-300">
-              <TypewriterText 
-                text="HYDRAULIC PRESSURE ENGAGED: 87.3%" 
-                onComplete={handleStatusTypingComplete}
-                className=""
-              />
-            </div>
-          )}
         </div>
       )}
 
       {/* Show keypad overlay when keypad is activated */}
       {keypadActivated && (
-        <div 
+        <div
           ref={keypadRef}
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-90 p-6 rounded-lg shadow-2xl border border-blue-500"
         >
@@ -172,13 +216,13 @@ const Gates = () => {
               ))}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-3 gap-2">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '✓'].map((btn) => (
-              <button 
-                key={btn} 
+              <button
+                key={btn}
                 className={`w-12 h-12 rounded-full font-mono 
-                  ${typeof btn === 'number' ? 'bg-gray-800 border border-blue-400' : 
+                  ${typeof btn === 'number' ? 'bg-gray-800 border border-blue-400' :
                     (btn === 'C' ? 'bg-red-900 border border-red-500' : 'bg-green-900 border border-green-500')} 
                   text-blue-300 text-xl flex items-center justify-center hover:opacity-80 active:opacity-60`}
                 onClick={() => {
@@ -195,8 +239,8 @@ const Gates = () => {
               </button>
             ))}
           </div>
-          
-          <button 
+
+          <button
             className="mt-4 w-full bg-gray-800 text-blue-300 p-2 rounded hover:bg-gray-700 font-mono tracking-wider uppercase border border-blue-400"
             onClick={() => setKeypadActivated(false)}
           >
