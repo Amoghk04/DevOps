@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
+import {useNavigate} from 'react-router-dom';
 
 const Gates = () => {
+  const navigate = useNavigate(); // Hook for navigation
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
@@ -11,10 +13,19 @@ const Gates = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [shake, setShake] = useState(false);
 
-
   // Create a ref for handling outside clicks
   const overlayRef = useRef(null);
   const keypadRef = useRef(null);
+
+  // Navigation function to other walls
+  const navigateToWall = (direction) => {
+    // Replace these paths with your actual component paths
+    if (direction === 'left') {
+      navigate('/wall2'); // Navigate to the left wall component
+    } else if (direction === 'right') {
+      navigate('/wall4'); // Navigate to the right wall component
+    }
+  };
 
   // Define interactive areas with their coordinates and handlers
   const areas = [
@@ -39,7 +50,23 @@ const Gates = () => {
         console.log('Keypad clicked!', area);
         setKeypadActivated(true);
       }
-    }
+    },
+    {
+      id: 'leftArrow',
+      coords: "50,300,120,350", // Adjust these coordinates as needed
+      onClick: (area) => {
+        console.log('Left arrow clicked!', area);
+        navigateToWall('left');
+      }
+    },
+    {
+      id: 'rightArrow',
+      coords: "1200,300,1270,350", // Adjust these coordinates as needed
+      onClick: (area) => {
+        console.log('Right arrow clicked!', area);
+        navigateToWall('right');
+      }
+    },
   ];
 
   // Add event listener for clicks outside the overlays
@@ -49,36 +76,32 @@ const Gates = () => {
       console.log("event.target:", event.target); // Log the clicked target element
       console.log("keypadRef.current:", keypadRef.current); // Log keypad reference
       console.log("overlayRef.current:", overlayRef.current); // Log overlay reference
-  
+
       // Handle keypad overlay
       if (keypadActivated && keypadRef.current && !keypadRef.current.contains(event.target)) {
-        console.log("Click is outside the keypad, deactivating keypad.");
         setKeypadActivated(false);
       }
-  
+
       // Hide the lever input overlay when clicked outside
       if (showInputOverlay && overlayRef.current && !overlayRef.current.contains(event.target)) {
-        console.log("Click is outside the input overlay, hiding it.");
         setShowInputOverlay(false);
       }
     };
-  
+
     const handleMouseMove = (e) => {
       setMousePos({ x: e.clientX, y: e.clientY });
     };
-  
+
     // Add the event listener
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('mousemove', handleMouseMove);
-  
+
     // Cleanup the event listener
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('mousemove', handleMouseMove);
     };
   }, [showLeverMessage, keypadActivated, showInputOverlay]);
-  
-  
 
   // Handle keypad input
   const handlePinInput = (digit) => {
@@ -113,6 +136,29 @@ const Gates = () => {
           showDebug={true}
         />
 
+        {/* Arrow Navigation Indicators */}
+        <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
+          <div 
+            className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
+            onClick={() => navigateToWall('left')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
+          <div 
+            className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
+            onClick={() => navigateToWall('right')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
+
         {/* Torchlight overlay */}
         {isDark && (
           <div
@@ -125,10 +171,10 @@ const Gates = () => {
         )}
       </div>
 
-      {/* Tech-styled text overlay at bottom center when lever is activated */}
+      {/* overlay for light at center */}
       {showInputOverlay && (
         <div
-          
+
           className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono"
           onClick={(e) => e.stopPropagation()} // prevent bubbling
         >
