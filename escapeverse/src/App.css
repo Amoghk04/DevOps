@@ -1,15 +1,17 @@
-/* App.css */
+/* filepath: c:\Users\assas\Music\DevOps\DevOps\escapeverse\src\App.css */
+
+/* Disable text selection globally */
 body {
+  -webkit-user-select: none; /* Chrome, Safari, Edge */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* Internet Explorer */
+  user-select: none;         /* Standard */
+}
+
+/* Optional: Utility class for specific elements */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
-}
-
-.custom-margin {
-  margin-right: 20%;
-}
-
-/* When screen width is 1024px or more (fullscreen), reduce margin to 15% */
-@media (min-width: 1024px) {
-  .custom-margin {
-    margin-right: 15%;
-  }
 }
