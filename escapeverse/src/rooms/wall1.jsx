@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import {useNavigate} from 'react-router-dom';
 
-const Gates = () => {
+const Wall1 = () => {
   const navigate = useNavigate(); // Hook for navigation
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
@@ -265,4 +265,4 @@ const Gates = () => {
   );
 };
 
-export default Gates;
+export default Wall1;

@@ -15,7 +15,7 @@ const Wall2 = () => {
       coords: "1200,300,1270,350", // Adjust these coordinates as needed
       onClick: (area) => {
         console.log('Right arrow clicked!', area);
-        navigate('/'); // Navigate back to the center wall (Gates)
+        navigate('/wall1'); // Navigate back to the center wall (Gates)
       }
     }
     // Add more interactive areas specific to the left wall here
