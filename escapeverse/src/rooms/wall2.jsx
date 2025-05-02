@@ -11,14 +11,7 @@ const Wall2 = () => {
   // Define interactive areas specific to the left wall
   const areas = [
     // Add any clickable areas specific to the left wall
-    {
-      id: 'rightArrow',
-      coords: "1200,300,1270,350", // Adjust these coordinates as needed
-      onClick: (area) => {
-        console.log('Right arrow clicked!', area);
-        navigate('/wall1'); // Navigate back to the center wall (Gates)
-      }
-    }
+    
     // Add more interactive areas specific to the left wall here
   ];
 
@@ -46,6 +39,17 @@ const Wall2 = () => {
         />
 
         {/* Right Arrow Navigation Indicator */}
+        <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
+          <div 
+            className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
+            onClick={() => navigate('/wall3')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
+        </div>
+
         <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
           <div 
             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"

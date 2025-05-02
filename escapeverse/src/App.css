@@ -1,4 +1,8 @@
 /* App.css */
+body {
+  user-select: none;
+}
+
 .custom-margin {
   margin-right: 20%;
 }

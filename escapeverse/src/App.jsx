@@ -9,6 +9,7 @@ import RoomLobby from './RoomLobby';
 import JoinRoom from './JoinRoom';
 import Wall1 from './rooms/wall1';
 import Wall2 from './rooms/wall2';
+import Wall3 from './rooms/wall3';
 
 function App() {
   const { user, loading } = useUser();
@@ -66,20 +67,25 @@ function App() {
           {/* game rooms */}
           <Route path="/game/:roomId/tech" element={
             <GameProvider>
-            <Wall1 />
+              <Wall1 />
             </GameProvider>
-            } 
-            />
+          }
+          />
 
           {/* Walls */}
           <Route path="/wall1" element={
             <GameProvider>
-            <Wall1 />
+              <Wall1 />
             </GameProvider>
-            } />
+          } />
           <Route path="/wall2" element={
             <GameProvider>
-            <Wall2 />
+              <Wall2 />
+            </GameProvider>
+          } />
+          <Route path="/wall3" element={
+            <GameProvider>
+              <Wall3 />
             </GameProvider>
           } />
         </Routes>
