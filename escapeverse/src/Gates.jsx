@@ -126,17 +126,6 @@ const Gates = () => {
     }
   };
 
-  // Handle typing completion
-  const handleTypingComplete = () => {
-    setTypingComplete(true);
-    setLeverActivated(true);
-  };
-
-  // Handle status text typing completion
-  const handleStatusTypingComplete = () => {
-    // Nothing special needs to happen when the second line completes
-  };
-
   return (
     <div className="relative">
       <div className="relative z-0">
