@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import InteractiveImageMap from './InteractiveImageMap';
+import InteractiveImageMap from '../InteractiveImageMap';
 
 const TypewriterText = ({ text, onComplete, className }) => {
   const [displayText, setDisplayText] = useState('');

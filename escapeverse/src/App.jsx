@@ -6,8 +6,7 @@ import LandingPage from './LandingPage';
 import CreateRoom from './CreateRoom';
 import RoomLobby from './RoomLobby';
 import JoinRoom from './JoinRoom';
-import Gates from './Gates';
-
+import Gates from './rooms/wall1';
 function App() {
   const { user, loading } = useUser();
 
