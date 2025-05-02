@@ -130,7 +130,7 @@ const Gates = () => {
     <div className="relative">
       <div className="relative z-0">
         <InteractiveImageMap
-          imageSrc="/door-finale.png"
+          imageSrc="/wall-1.png"
           areas={areas}
           fullscreenOnMount={true}
           showDebug={true}
