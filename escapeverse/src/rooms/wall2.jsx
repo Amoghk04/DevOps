@@ -11,7 +11,28 @@ const Wall2 = () => {
   // Define interactive areas specific to the left wall
   const areas = [
     // Add any clickable areas specific to the left wall
-    
+    {
+      id: 'rightArrow',
+      coords: "1200,300,1270,350", // Adjust these coordinates as needed
+      onClick: (area) => {
+        console.log('Right arrow clicked!', area);
+        navigate('/wall1'); // Navigate back to the center wall (Gates)
+      }
+    },
+    {
+      id: 'monitor',
+      coords: "550,365,749,365,751,489,548,490", // Adjust these coordinates as needed
+      onClick: () => {
+          console.log('Monitor clicked!',);
+      }
+    },
+    {
+        id: 'fuseBox',
+        coords: "365,520,364,408,444,409,444,520", // Adjust these coordinates as needed
+        onClick: () => {
+            console.log('fuseBox clicked!',);
+        }
+    },
     // Add more interactive areas specific to the left wall here
   ];
 
