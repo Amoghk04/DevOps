@@ -2,17 +2,21 @@ import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import {useNavigate} from 'react-router-dom';
 import { useGame } from './GameProvider';
+import GateComponent from '../puzzles/GateComponent';
 
 const Wall1 = () => {
   const navigate = useNavigate(); // Hook for navigation
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
-  const { isDark, setIsDark } = useGame();
+  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [shake, setShake] = useState(false);
+  
+  // Store whether the areas have been updated
+  const [areasUpdated, setAreasUpdated] = useState(false);
 
   // Create a ref for handling outside clicks
   const overlayRef = useRef(null);
@@ -28,8 +32,15 @@ const Wall1 = () => {
     }
   };
 
+  // Handle gate click from GateComponent
+  const handleGateClick = (gateNumber) => {
+    console.log(`Gate ${gateNumber} clicked from Wall1!`);
+    // You can add any Wall1-specific gate handling here
+  };
+
   // Define interactive areas with their coordinates and handlers
-  const areas = [
+  // IMPORTANT: Move this BEFORE any useEffect that references it
+  const [areas, setAreas] = useState([
     {
       id: 'lever',
       coords: "622,271,686,271,684,461,671,466,667,490,595,492,579,488,581,468,588,448,603,441,623,436,623,359",
@@ -68,12 +79,150 @@ const Wall1 = () => {
         navigateToWall('right');
       }
     },
-  ];
+    // Gate areas will be dynamically updated with coordinates
+    {
+      id: 'gate1',
+      coords: "250,350,320,450", // These coordinates will be updated
+      onClick: (area) => {
+        // Now handled by GateComponent
+      }
+    },
+    {
+      id: 'gate2',
+      coords: "650,350,720,450", // These coordinates will be updated
+      onClick: (area) => {
+        // Now handled by GateComponent
+      }
+    },
+    {
+      id: 'gate3',
+      coords: "1050,350,1120,450", // These coordinates will be updated
+      onClick: (area) => {
+        // Now handled by GateComponent
+      }
+    },
+  ]);
+  
+  // Generate gate positions on component mount if they don't exist in context
+  useEffect(() => {
+    // Only generate positions if they don't already exist in the game context
+    if (wall1GatePositions && wall1GatePositions.length > 0) {
+      return; // Positions already exist, no need to generate
+    }
+    
+    // Generate new random positions
+    // Define the boundaries for gate placement
+    const minLeftPosition = 120; // Minimum left position
+    const maxLeftPosition = window.innerWidth - 180; // Maximum left position
+    const minTopPosition = 250; // Minimum top position  
+    const maxTopPosition = 450; // Maximum top position
+
+    // Define static elements to avoid overlapping with them
+    const staticElements = [
+      // Lever area - approximate rectangle
+      { left: 580, top: 270, width: 110, height: 220 },
+      // Keypad area
+      { left: 1165, top: 419, width: 107, height: 137 },
+      // Left navigation arrow
+      { left: 50, top: 300, width: 70, height: 50 },
+      // Right navigation arrow
+      { left: 1200, top: 300, width: 70, height: 50 }
+    ];
+
+    // Function to check if a position overlaps with static elements
+    const overlapsWithStatic = (position, width = 70, height = 100) => {
+      // Add a buffer zone around static elements
+      const buffer = 30;
+      
+      for (const element of staticElements) {
+        // Check for overlap with buffer zone
+        if (
+          position.left < element.left + element.width + buffer &&
+          position.left + width + buffer > element.left &&
+          position.top < element.top + element.height + buffer &&
+          position.top + height + buffer > element.top
+        ) {
+          return true; // Overlap detected
+        }
+      }
+      return false; // No overlap
+    };
+
+    // Function to generate a random position within bounds
+    const generateRandomPosition = () => {
+      const left = Math.floor(Math.random() * (maxLeftPosition - minLeftPosition)) + minLeftPosition;
+      const top = Math.floor(Math.random() * (maxTopPosition - minTopPosition)) + minTopPosition;
+      return { left, top };
+    };
+
+    // Generate positions, ensuring they don't overlap with static elements or each other
+    const positions = [];
+    for (let i = 0; i < 3; i++) {
+      let newPosition;
+      let overlap;
+      
+      do {
+        overlap = false;
+        newPosition = generateRandomPosition();
+        
+        // Check if this position overlaps with static elements
+        if (overlapsWithStatic(newPosition)) {
+          overlap = true;
+          continue;
+        }
+        
+        // Check if this position overlaps with any existing gate positions
+        for (const pos of positions) {
+          // Define a minimum distance between gates
+          const minDistance = 150;
+          const distance = Math.sqrt(
+            Math.pow(newPosition.left - pos.left, 2) + 
+            Math.pow(newPosition.top - pos.top, 2)
+          );
+          
+          if (distance < minDistance) {
+            overlap = true;
+            break;
+          }
+        }
+      } while (overlap);
+      
+      positions.push(newPosition);
+    }
+
+    // Save the new positions to game context instead of localStorage
+    setWall1GatePositions(positions);
+  }, [wall1GatePositions, setWall1GatePositions]);
+  
+  // Update the area coordinates for gates whenever wall1GatePositions changes
+  useEffect(() => {
+    if (wall1GatePositions.length > 0 && !areasUpdated) {
+      // Create a copy of the areas array
+      const newAreas = [...areas];
+      
+      // Update coordinates for each gate
+      for (let i = 0; i < 3; i++) {
+        const gateIndex = newAreas.findIndex(area => area.id === `gate${i+1}`);
+        if (gateIndex !== -1) {
+          const pos = wall1GatePositions[i];
+          // Create a new object for this area with updated coords
+          newAreas[gateIndex] = {
+            ...newAreas[gateIndex],
+            coords: `${pos.left},${pos.top},${pos.left + 70},${pos.top + 100}`
+          };
+        }
+      }
+      
+      // Update the areas state with the new array
+      setAreas(newAreas);
+      setAreasUpdated(true);
+    }
+  }, [wall1GatePositions, areas, areasUpdated]);
 
   // Add event listener for clicks outside the overlays
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log("Even");
+      console.log("Event");
       console.log("event.target:", event.target); // Log the clicked target element
       console.log("keypadRef.current:", keypadRef.current); // Log keypad reference
       console.log("overlayRef.current:", overlayRef.current); // Log overlay reference
@@ -138,6 +287,12 @@ const Wall1 = () => {
           className="w-full h-full object-cover"
         />
 
+        {/* Use GateComponent to render gates */}
+        <GateComponent 
+          gatePositions={wall1GatePositions}
+          onGateClick={handleGateClick}
+        />
+
         {/* Arrow Navigation Indicators */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
           <div 
@@ -176,7 +331,6 @@ const Wall1 = () => {
       {/* overlay for light at center */}
       {showInputOverlay && (
         <div
-
           className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono"
           onClick={(e) => e.stopPropagation()} // prevent bubbling
         >
