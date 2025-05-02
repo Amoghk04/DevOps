@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';
+import ComputerScreen from '../puzzles/ComputerScreen';
 
 const Wall2 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
+    const [showComputer, setShowComputer] = useState(false); // State to control computer screen visibility
 
     // Define interactive areas specific to the left wall
     const areas = [
@@ -23,14 +25,15 @@ const Wall2 = () => {
             id: 'monitor',
             coords: "550,365,749,365,751,489,548,490", // Adjust these coordinates as needed
             onClick: () => {
-                console.log('Monitor clicked!',);
+                console.log('Monitor clicked!');
+                setShowComputer(true); // Show the computer screen when the monitor is clicked
             }
         },
         {
             id: 'fuseBox',
             coords: "365,520,364,408,444,409,444,520", // Adjust these coordinates as needed
             onClick: () => {
-                console.log('fuseBox clicked!',);
+                console.log('fuseBox clicked!');
             }
         },
         // Add more interactive areas specific to the left wall here
@@ -47,6 +50,11 @@ const Wall2 = () => {
             document.removeEventListener('mousemove', handleMouseMove);
         };
     }, []);
+
+    // Handle closing the computer screen
+    const handleCloseComputer = () => {
+        setShowComputer(false);
+    };
 
     return (
         <div className='no-select'>
@@ -93,6 +101,12 @@ const Wall2 = () => {
                             }}
                         ></div>
                     )}
+                    
+                    {/* Computer Screen Component */}
+                    <ComputerScreen 
+                        isOpen={showComputer} 
+                        onClose={handleCloseComputer} 
+                    />
                 </div>
 
                 {/* Add any interactive overlays specific to the left wall here */}
