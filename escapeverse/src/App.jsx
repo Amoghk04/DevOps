@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useUser } from './UserContext';
+import { GameProvider } from './rooms/GameProvider';
 import './App.css';
 import AuthForm from './AuthForm';
 import LandingPage from './LandingPage';
@@ -63,11 +64,24 @@ function App() {
           <Route path="/room/:roomId" element={<RoomLobby />} />
           <Route path="/join-room" element={<JoinRoom />} />
           {/* game rooms */}
-          <Route path="/game/:roomId/tech" element={<Wall1 />} />
+          <Route path="/game/:roomId/tech" element={
+            <GameProvider>
+            <Wall1 />
+            </GameProvider>
+            } 
+            />
 
           {/* Walls */}
-          <Route path="/wall1" element={<Wall1 />} />
-          <Route path="/wall2" element={<Wall2 />} />
+          <Route path="/wall1" element={
+            <GameProvider>
+            <Wall1 />
+            </GameProvider>
+            } />
+          <Route path="/wall2" element={
+            <GameProvider>
+            <Wall2 />
+            </GameProvider>
+          } />
         </Routes>
       </div>
     </Router>

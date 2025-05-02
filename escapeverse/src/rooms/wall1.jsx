@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import {useNavigate} from 'react-router-dom';
+import { useGame } from './GameProvider';
 
 const Wall1 = () => {
   const navigate = useNavigate(); // Hook for navigation
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
-  const [isDark, setIsDark] = useState(true); // true = torch mode
+  const { isDark, setIsDark } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });

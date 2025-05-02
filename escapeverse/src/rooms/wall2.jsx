@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
+import { useGame } from './GameProvider';
 
 const Wall2 = () => {
   const navigate = useNavigate();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isDark, setIsDark] = useState(true); // true = torch mode
+  const { isDark } = useGame();
   
   // Define interactive areas specific to the left wall
   const areas = [
@@ -34,20 +35,21 @@ const Wall2 = () => {
   }, []);
 
   return (
-    <div className="relative">
-      <div className="relative z-0">
+    <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <div className="relative w-full h-full">
         <InteractiveImageMap
-          imageSrc="/left-wall.png" // Replace with your actual left wall image
+          imageSrc="/wall2.png" // Replace with your actual left wall image
           areas={areas}
           fullscreenOnMount={true}
           showDebug={true}
+          className="w-full h-full object-cover"
         />
 
         {/* Right Arrow Navigation Indicator */}
         <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
           <div 
             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
-            onClick={() => navigate('/')} // Navigate back to the center wall
+            onClick={() => navigate('/wall1')} // Navigate back to the center wall
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
