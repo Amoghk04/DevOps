@@ -1,33 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 
-const TypewriterText = ({ text, onComplete, className }) => {
-  const [displayText, setDisplayText] = useState('');
-  const index = useRef(0);
-
-  useEffect(() => {
-    if (index.current < text.length) {
-      const typingTimer = setTimeout(() => {
-        setDisplayText(prev => prev + text[index.current]);
-        index.current += 1;
-      }, 40); // Typing speed - adjust as needed
-
-      return () => clearTimeout(typingTimer);
-    } else if (onComplete) {
-      onComplete();
-    }
-  }, [displayText, text, onComplete]);
-
-  return <span className={className}>{displayText}</span>;
-};
-
 const Gates = () => {
-  const [leverActivated, setLeverActivated] = useState(false);
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
-  const [typingComplete, setTypingComplete] = useState(false);
-  const [statusText, setStatusText] = useState('');
   const [isDark, setIsDark] = useState(true); // true = torch mode
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
