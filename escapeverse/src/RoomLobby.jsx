@@ -101,6 +101,14 @@ function RoomLobby() {
     }
   };
 
+  const copyRoomCode = () => {
+    navigator.clipboard.writeText(roomId).then(() => {
+      alert("Room code copied to clipboard!");
+    }).catch((err) => {
+      console.error("Failed to copy room code:", err);
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-white p-10 bg-black/70">
       <h1 className="text-3xl font-bold mb-4">Room: {roomId}</h1>
@@ -111,6 +119,12 @@ function RoomLobby() {
         <h3 className="text-xl font-semibold">Room Code:</h3>
         <p className="text-2xl font-mono bg-gray-800 px-4 py-2 rounded">{roomId}</p>
         <p className="text-sm mt-2">Share this code with friends to join!</p>
+        <button
+          onClick={copyRoomCode}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+        >
+          Copy Room Code
+        </button>
       </div>
       
       {/* Display the players list */}
