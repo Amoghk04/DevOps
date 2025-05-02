@@ -22,17 +22,17 @@ const Wall2 = () => {
     // Add more interactive areas specific to the left wall here
   ];
 
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-  
-    document.addEventListener('mousemove', handleMouseMove);
-  
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            setMousePos({ x: e.clientX, y: e.clientY });
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -57,21 +57,21 @@ const Wall2 = () => {
           </div>
         </div>
 
-        {/* Torchlight overlay */}
-        {isDark && (
-          <div
-            className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
-            style={{
-              background: `radial-gradient(circle 100px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.95) 100%)`,
-              transition: 'background-position 0.05s ease-out',
-            }}
-          ></div>
-        )}
-      </div>
-      
-      {/* Add any interactive overlays specific to the left wall here */}
-    </div>
-  );
+                {/* Torchlight overlay */}
+                {isDark && (
+                    <div
+                        className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
+                        style={{
+                            background: `radial-gradient(circle 100px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.95) 100%)`,
+                            transition: 'background-position 0.05s ease-out',
+                        }}
+                    ></div>
+                )}
+            </div>
+
+            {/* Add any interactive overlays specific to the left wall here */}
+        </div>
+    );
 };
 
 export default Wall2;
