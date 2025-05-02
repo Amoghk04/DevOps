@@ -104,13 +104,14 @@ const Gates = () => {
   };
 
   return (
-    <div className="relative">
-      <div className="relative z-0">
+    <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <div className="relative w-full h-full">
         <InteractiveImageMap
           imageSrc="/wall-1.png"
           areas={areas}
           fullscreenOnMount={true}
           showDebug={true}
+          className="w-full h-full object-cover"
         />
 
         {/* Torchlight overlay */}
