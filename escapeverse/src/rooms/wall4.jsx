@@ -7,6 +7,7 @@ const Wall4 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
+    const [currentImage, setCurrentImage] = useState("/wall4-closed.png");
 
     // Define interactive areas specific to the left wall
     const areas = [
@@ -20,7 +21,7 @@ const Wall4 = () => {
         },
         {
             id: 'passcode',
-            coords: "851,217,879,218,879,248,851,249",
+            coords: "851,217,879,218,879,249,851,249",
             onClick: () => {
                 console.log('passcode clicked!');
             }
@@ -28,6 +29,22 @@ const Wall4 = () => {
         
         // Add more interactive areas specific to the left wall here
     ];
+
+    const areas1 = [
+        {
+            id: 'closed-window',
+            coords: "484,47,984,47,982,784,481,784",
+            onClick: () => {
+            },
+        },
+        {
+            id: 'passcode',
+            coords: "1021,264,1066,264,1067,327,1021,327",
+            onClick: () => {
+                setCurrentImage("/wall4.png"); // Change the image when clicked
+            }
+        }
+    ]
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -45,8 +62,8 @@ const Wall4 = () => {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
       <div className="relative w-full h-full">
                 <InteractiveImageMap
-                    imageSrc="/wall4.png"
-                    areas={areas}
+                    imageSrc={currentImage}
+                areas={currentImage === "/wall4.png" ? areas : areas1}
                     fullscreenOnMount={true}
                     showDebug={true}
                     className="w-full h-full object-cover"
