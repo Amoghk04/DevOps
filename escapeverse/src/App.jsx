@@ -10,6 +10,7 @@ import JoinRoom from './JoinRoom';
 import Wall1 from './rooms/wall1';
 import Wall2 from './rooms/wall2';
 import Wall3 from './rooms/wall3';
+import Wall4 from './rooms/wall4';
 
 function App() {
   const { user, loading } = useUser();
@@ -86,6 +87,11 @@ function App() {
           <Route path="/wall3" element={
             <GameProvider>
               <Wall3 />
+            </GameProvider>
+          } />
+          <Route path="/wall4" element={
+            <GameProvider>
+              <Wall4 />
             </GameProvider>
           } />
         </Routes>
