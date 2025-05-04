@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';
-import ComputerScreen from '../puzzles/ComputerScreen';
+import ComputerScreen from './tech/Component/ComputerScreen';
 
 const Wall2 = () => {
     const navigate = useNavigate();
@@ -12,15 +12,6 @@ const Wall2 = () => {
 
     // Define interactive areas specific to the left wall
     const areas = [
-        // Add any clickable areas specific to the left wall
-        {
-            id: 'rightArrow',
-            coords: "1200,300,1270,350", // Adjust these coordinates as needed
-            onClick: (area) => {
-                console.log('Right arrow clicked!', area);
-                navigate('/wall1'); // Navigate back to the center wall (Gates)
-            }
-        },
         {
             id: 'monitor',
             coords: "550,365,749,365,751,489,548,490", // Adjust these coordinates as needed
