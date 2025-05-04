@@ -3,31 +3,56 @@ import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';
 import ComputerScreen from './tech/Component/ComputerScreen';
+import WirePuzzle from './tech/Component/WirePuzzle'; // Import the wire puzzle component
 
 const Wall2 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
-    const [showComputer, setShowComputer] = useState(false); // State to control computer screen visibility
+    const [showComputer, setShowComputer] = useState(false);
+    const [showWirePuzzle, setShowWirePuzzle] = useState(false); // State to control wire puzzle visibility
+    const [isPowerOn, setIsPowerOn] = useState(false); // State to track if power is restored
+    const [showMessage, setShowMessage] = useState(false); // State to show messages
+    const [message, setMessage] = useState(''); // Message content
+    
+    // Display message function
+    const displayMessage = (text, duration = 3000) => {
+        setMessage(text);
+        setShowMessage(true);
+        setTimeout(() => setShowMessage(false), duration);
+    };
+    
+    // Handle puzzle completion
+    const handlePuzzleComplete = () => {
+        setIsPowerOn(true);
+        setShowWirePuzzle(false);
+        displayMessage('Power restored! The monitor can now be accessed.');
+    };
 
-    // Define interactive areas specific to the left wall
+    // Define interactive areas specific to the wall
     const areas = [
         {
             id: 'monitor',
-            coords: "550,365,749,365,751,489,548,490", // Adjust these coordinates as needed
+            coords: "550,365,749,365,751,489,548,490",
             onClick: () => {
-                console.log('Monitor clicked!');
-                setShowComputer(true); // Show the computer screen when the monitor is clicked
+                if (!isPowerOn) {
+                    displayMessage('ERROR: No power!');
+                } else {
+                    setShowComputer(true); // Show the computer screen when the monitor is clicked
+                }
             }
         },
         {
             id: 'fuseBox',
-            coords: "365,520,364,408,444,409,444,520", // Adjust these coordinates as needed
+            coords: "365,520,364,408,444,409,444,520",
             onClick: () => {
-                console.log('fuseBox clicked!');
+                if (!isPowerOn) {
+                    setShowWirePuzzle(true); // Show the wire puzzle when the fuseBox is clicked
+                } else {
+                    displayMessage('The power is already restored.');
+                }
             }
-        },
-        // Add more interactive areas specific to the left wall here
+        }
     ];
 
     useEffect(() => {
@@ -52,14 +77,14 @@ const Wall2 = () => {
             <div className="absolute inset-0 w-full h-full overflow-hidden">
                 <div className="relative w-full h-full">
                     <InteractiveImageMap
-                        imageSrc="/wall2.png" // Replace with your actual left wall image
+                        imageSrc="/wall2.png"
                         areas={areas}
                         fullscreenOnMount={true}
                         showDebug={true}
                         className="w-full h-full object-cover"
                     />
 
-                    {/* Right Arrow Navigation Indicator */}
+                    {/* Left Arrow Navigation Indicator */}
                     <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
                         <div
                             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
@@ -71,10 +96,11 @@ const Wall2 = () => {
                         </div>
                     </div>
 
+                    {/* Right Arrow Navigation */}
                     <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
                         <div
                             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
-                            onClick={() => navigate('/wall1')} // Navigate back to the center wall
+                            onClick={() => navigate('/wall1')}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -93,14 +119,27 @@ const Wall2 = () => {
                         ></div>
                     )}
                     
+                    {/* Message Overlay */}
+                    {showMessage && (
+                        <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-red-500 p-4 rounded-lg border border-red-500 text-center z-20">
+                            {message}
+                        </div>
+                    )}
+                    
                     {/* Computer Screen Component */}
                     <ComputerScreen 
                         isOpen={showComputer} 
                         onClose={handleCloseComputer} 
                     />
+                    
+                    {/* Wire Puzzle Component */}
+                    {showWirePuzzle && (
+                        <WirePuzzle
+                            onComplete={handlePuzzleComplete}
+                            onClose={() => setShowWirePuzzle(false)}
+                        />
+                    )}
                 </div>
-
-                {/* Add any interactive overlays specific to the left wall here */}
             </div>
         </div>
     );
