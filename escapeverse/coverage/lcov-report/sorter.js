@@ -1,6 +1,11 @@
  
 var addSorting = (function() {
     'use strict';
+    function sanitize(value) {
+        const div = document.createElement('div');
+        div.textContent = value;
+        return div.innerHTML;
+    }
     var cols,
         currentSort = {
             index: 0,
@@ -85,7 +90,7 @@ var addSorting = (function() {
         for (i = 0; i < tableCols.length; i += 1) {
             colNode = tableCols[i];
             col = cols[i];
-            val = colNode.getAttribute('data-value');
+            val = sanitize(colNode.getAttribute('data-value'));
             if (col.type === 'number') {
                 val = Number(val);
             }
