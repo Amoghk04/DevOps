@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { XCircle } from 'lucide-react';
-import qTable from '../AI/tic_tac_toe.json';
+import qTable from '../AI/tic_tac_easy.json';
 
 const TicTacToe = ({ onClose, onWin }) => {
   const [board, setBoard] = useState(Array(9).fill(null));
