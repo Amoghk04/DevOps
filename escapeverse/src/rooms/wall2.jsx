@@ -14,14 +14,14 @@ const Wall2 = () => {
     const [isPowerOn, setIsPowerOn] = useState(false); // State to track if power is restored
     const [showMessage, setShowMessage] = useState(false); // State to show messages
     const [message, setMessage] = useState(''); // Message content
-    
+
     // Display message function
     const displayMessage = (text, duration = 3000) => {
         setMessage(text);
         setShowMessage(true);
         setTimeout(() => setShowMessage(false), duration);
     };
-    
+
     // Handle puzzle completion
     const handlePuzzleComplete = () => {
         setIsPowerOn(true);
@@ -118,20 +118,23 @@ const Wall2 = () => {
                             }}
                         ></div>
                     )}
-                    
+
                     {/* Message Overlay */}
-                    {showMessage && (
+                    {showMessage && (isPowerOn ? (
+                        <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-green-500 p-4 rounded-lg border border-green-500 text-center z-20">
+                            {message}
+                        </div>) :
                         <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-red-500 p-4 rounded-lg border border-red-500 text-center z-20">
                             {message}
                         </div>
                     )}
-                    
+
                     {/* Computer Screen Component */}
-                    <ComputerScreen 
-                        isOpen={showComputer} 
-                        onClose={handleCloseComputer} 
+                    <ComputerScreen
+                        isOpen={showComputer}
+                        onClose={handleCloseComputer}
                     />
-                    
+
                     {/* Wire Puzzle Component */}
                     {showWirePuzzle && (
                         <WirePuzzle

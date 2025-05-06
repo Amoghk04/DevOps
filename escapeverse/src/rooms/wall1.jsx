@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import {useNavigate} from 'react-router-dom';
 import { useGame } from './GameProvider';
-import GateComponent from '../puzzles/GateComponent';
+import GateComponent from './tech/Component/GateComponent';
 
 const Wall1 = () => {
   const navigate = useNavigate(); // Hook for navigation
