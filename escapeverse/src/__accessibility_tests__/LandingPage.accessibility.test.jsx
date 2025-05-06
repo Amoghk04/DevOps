@@ -2,18 +2,18 @@
 import { render } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { BrowserRouter } from 'react-router-dom';
-import { UserContext } from './UserContext';
-import LandingPage from './LandingPage';
+import { UserContext } from '../UserContext';
+import LandingPage from '../LandingPage';
 
 // Mock dependencies
-jest.mock('./firebase', () => ({
+jest.mock('../firebase', () => ({
   auth: {
     signOut: jest.fn().mockResolvedValue({}),
   },
 }));
 
 // Mock ProfileOverlay component
-jest.mock('./ProfileOverlay', () => function MockProfileOverlay({ onClose }) {
+jest.mock('../ProfileOverlay', () => function MockProfileOverlay({ onClose }) {
   return <div role="dialog" data-testid="profile-overlay">
     <button onClick={onClose}>Close</button>
   </div>
