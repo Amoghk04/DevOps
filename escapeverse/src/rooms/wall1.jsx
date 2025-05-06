@@ -97,7 +97,7 @@ const Wall1 = () => {
     {
       id: 'gate3',
       coords: "1050,350,1120,450", // These coordinates will be updated
-      onClick: (area) => {
+      onClick: () => {
         // Now handled by GateComponent
       }
     },
