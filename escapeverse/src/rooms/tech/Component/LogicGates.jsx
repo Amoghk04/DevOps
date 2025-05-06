@@ -4,9 +4,9 @@ const canvasStyle = {
     marginTop: "20px",
     backgroundColor: "#111",
     backgroundImage: `
-    linear-gradient(0deg, #222 1px, transparent 1px),
-    linear-gradient(90deg, #222 1px, transparent 1px)
-  `,
+        linear-gradient(0deg, #222 1px, transparent 1px),
+        linear-gradient(90deg, #222 1px, transparent 1px)
+    `,
     backgroundSize: "40px 40px",
     border: "1px solid #0ff"
 };
@@ -26,12 +26,17 @@ export default function LogicGatePuzzle() {
     const canvasRef = useRef(null);
     const [answer, setAnswer] = useState("");
     const [circuit, setCircuit] = useState(null);
+    const [userOutputs, setUserOutputs] = useState([]);
+    const [isOpen, setIsOpen] = useState(true);
+    const overlayRef = useRef(null);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
         const gates = ["AND", "OR", "NOT"];
+        const outputPositions = [];
 
         const randomBool = () => (Math.random() < 0.5 ? 0 : 1);
         const getRandomGate = () => gates[Math.floor(Math.random() * gates.length)];
@@ -46,13 +51,13 @@ export default function LogicGatePuzzle() {
             const type = getRandomGate();
             let ins;
             if (type === "NOT") {
-                ins = [possibleInputs[Math.floor(Math.random() * possibleInputs.length)]]; // One input for NOT
+                ins = [possibleInputs[Math.floor(Math.random() * possibleInputs.length)]];
             } else {
                 const a = possibleInputs[Math.floor(Math.random() * possibleInputs.length)];
                 let b;
                 do {
                     b = possibleInputs[Math.floor(Math.random() * possibleInputs.length)];
-                } while (b === a); // Ensure two different inputs for AND/OR
+                } while (b === a);
                 ins = [a, b];
             }
             return { id, type, ins };
@@ -142,28 +147,27 @@ export default function LogicGatePuzzle() {
 
         const drawCircle = (ctx, x, y, value, op) => {
             ctx.beginPath();
-            ctx.arc(x, y, 10, 0, 2 * Math.PI); // Draw a circle with radius 10
-            if(op === "input") {
-                ctx.fillStyle = value == 1 ? "#0f0" : "#f00"; // Green for 1, red for 0
-            }
-            else {
-                ctx.fillStyle = "white"; // Green for 1, red for 0
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
+            if (op === "input") {
+                ctx.fillStyle = value === 1 ? "#0f0" : "#f00";
+            } else {
+                // For outputs, use white for -1, green for 1, red for 0
+                ctx.fillStyle = value === -1 ? "white" : (value === 1 ? "#0f0" : "#f00");
             }
             ctx.fill();
             ctx.stroke();
         };
 
-        const drawCircuit = (circuit) => {
+        const drawCircuit = (circuit, outputsToUse) => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.font = "14px monospace";
             ctx.lineWidth = 2;
 
             const positions = {};
 
-            // Display only input values as 0 or 1, and draw circles
             ["A", "B", "C"].forEach((key, i) => {
                 positions[key] = { x: 120, y: 100 + i * 150 };
-                drawCircle(ctx, 140, positions[key].y, circuit.inputs[key], "input"); // Draw circle for input
+                drawCircle(ctx, 140, positions[key].y, circuit.inputs[key], "input");
             });
 
             const positionLayer = (layer, xStart) => {
@@ -194,40 +198,91 @@ export default function LogicGatePuzzle() {
             drawConnections(circuit.layer2);
             drawConnections(circuit.layer3);
 
-            // Only draw output circles, no text
-            circuit.outputs.forEach((val, i) => {
+            outputPositions.length = 0; // Reset output positions
+
+            outputsToUse.forEach((val, i) => {
                 const outputY = 100 + i * 150;
-                drawCircle(ctx, 1130, outputY, val, "output"); // Draw circle for output
+                drawCircle(ctx, 1130, outputY, val, "output");
+                outputPositions.push({ x: 1130, y: outputY, index: i });
             });
 
-            // Connect the final gates (layer3) to the outputs with lines
             circuit.layer3.forEach((g, i) => {
                 const gatePos = positions[g.id];
-                const outputPos = { x: 1150, y: 100 + i * 150 }; // Corresponding output position
+                const outputPos = { x: 1150, y: 100 + i * 150 };
                 ctx.beginPath();
-                ctx.moveTo(gatePos.x + 30, gatePos.y); // Start from the final gate
-                ctx.lineTo(outputPos.x - 30, outputPos.y); // Connect to the output
+                ctx.moveTo(gatePos.x + 30, gatePos.y);
+                ctx.lineTo(outputPos.x - 30, outputPos.y);
                 ctx.stroke();
             });
         };
 
         const c = generateCircuit();
-        drawCircuit(c);
         setCircuit(c);
+        setUserOutputs(Array(c.outputs.length).fill(-1));
+        drawCircuit(c, Array(c.outputs.length).fill(-1));
+
+        const handleClick = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            for (let { x: cx, y: cy, index } of outputPositions) {
+                const dx = x - cx;
+                const dy = y - cy;
+                if (dx * dx + dy * dy <= 100) {
+                    setUserOutputs(prev => {
+                        const newOutputs = [...prev];
+                        // Change this line to properly initialize value if it's -1
+                        newOutputs[index] = newOutputs[index] === -1 ? 1 : (newOutputs[index] === 1 ? 0 : 1);
+                        drawCircuit(c, newOutputs);
+                        return newOutputs;
+                    });
+                    break;
+                }
+            }
+        };
+
+        canvas.addEventListener("click", handleClick);
+        return () => canvas.removeEventListener("click", handleClick);
     }, []);
 
     const revealAnswer = () => {
         if (circuit) {
-            setAnswer("Final Output: " + circuit.outputs.join(" "));
+            setAnswer("Correct Output: " + circuit.outputs.join(" "));
         }
     };
 
+    // Add this before the return statement
+    const checkAnswer = () => {
+        if (circuit) {
+            const isCorrect = userOutputs.every((output, index) => output === circuit.outputs[index]);
+            console.log("User Outputs:", userOutputs, "Correct Outputs:", circuit.outputs);
+            setSuccessMessage(isCorrect ? "✅ Gate is connected and fixed!" : "❌ Not quite right, try again!");
+        }
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (overlayRef.current && !overlayRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+    
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Replace the existing return statement
     return (
         <div style={{ background: "#0a0a0a", color: "#0ff", fontFamily: "monospace", textAlign: "center" }}>
             <canvas ref={canvasRef} width="1200" height="500" style={canvasStyle}></canvas>
             <br />
             <button onClick={revealAnswer} style={buttonStyle}>Reveal Answer</button>
+            <button onClick={checkAnswer} style={buttonStyle}>Check Solution</button>
             <div>{answer}</div>
+            <div style={{ color: successMessage.includes("✅") ? "#0f0" : "#f00", marginTop: "10px" }}>
+                {successMessage}
+            </div>
         </div>
     );
 }

@@ -27,12 +27,18 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
   // Close overlay on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (activeGate && gateOverlayRef.current && !gateOverlayRef.current.contains(event.target)) {
+      if (gateOverlayRef.current && !gateOverlayRef.current.contains(event.target)) {
         setActiveGate(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    if (activeGate) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [activeGate]);
 
   return (
@@ -56,20 +62,15 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
       })}
 
       {/* Gate puzzle overlay */}
+      {/* Gate puzzle overlay */}
       {activeGate && (
-        <div
-          className="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             ref={gateOverlayRef}
-            className="bg-black w-full h-full rounded-xl p-6 flex flex-col items-center justify-center"
+            className="bg-orange-950 w-[600px] h-[400px] rounded-xl p-4 flex flex-col items-center justify-center"
           >
             <div className="text-2xl text-amber-500 mb-4">Gate {activeGate} Circuit</div>
-
-            {/* Display the LogicGatePuzzle as the full circuit */}
-            <LogicGatePuzzle />
-
+            <LogicGatePuzzle onClose={() => setActiveGate(null)} />
           </div>
         </div>
       )}
