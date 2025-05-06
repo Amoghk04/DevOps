@@ -32,6 +32,8 @@ PS: take me back to where my home is, I shall give you the passkey.`, hidden: tr
   const [openFile, setOpenFile] = useState(null);
   const [time, setTime] = useState(new Date());
 
+hasDecryptedFile, wall2Number;
+
   useEffect(() => {
     // Automatically scroll terminal to bottom when new content is added
     if (terminalRef.current && activeApp === 'terminal') {
