@@ -10,7 +10,7 @@ const ComputerScreen = ({ isOpen, onClose }) => {
   ]);
   const [terminalInput, setTerminalInput] = useState('');
   const terminalRef = useRef(null);
-  const [files, setFiles] = useState([
+  const [files] = useState([
     { id: 1, name: 'readme.txt', type: 'text', content: 'Welcome to the secret facility terminal. Navigate carefully.' },
     { id: 2, name: 'access_codes.dat', type: 'data', content: 'ERROR: File corrupted or encrypted.' },
     { id: 3, name: 'security_log.txt', type: 'text', content: 'Last access: REDACTED\nSecurity breach attempts: 3\nStatus: LOCKDOWN' }

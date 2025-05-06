@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';

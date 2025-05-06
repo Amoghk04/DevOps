@@ -209,7 +209,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
             ))}
             
             {/* Right endpoints */}
-            {wires.map((wire, index) => {
+            {wires.map((wire) => {
               // Use the correct color's position for the right endpoint
               const rightColorIndex = COLORS.indexOf(wire.rightColor);
               const yPos = 50 + rightColorIndex * 60;

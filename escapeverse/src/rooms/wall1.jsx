@@ -44,8 +44,8 @@ const Wall1 = () => {
     {
       id: 'lever',
       coords: "622,271,686,271,684,461,671,466,667,490,595,492,579,488,581,468,588,448,603,441,623,436,623,359",
-      onClick: (area) => {
-        console.log('Lever clicked!', area);
+      onClick: () => {
+        console.log('Lever clicked!');
         setShowInputOverlay(true);
         setUserInput('');
 
@@ -58,24 +58,24 @@ const Wall1 = () => {
     {
       id: 'keypad',
       coords: "1165,419,1272,419,1272,556,1167,556",
-      onClick: (area) => {
-        console.log('Keypad clicked!', area);
+      onClick: () => {
+        console.log('Keypad clicked!');
         setKeypadActivated(true);
       }
     },
     {
       id: 'leftArrow',
       coords: "50,300,120,350", // Adjust these coordinates as needed
-      onClick: (area) => {
-        console.log('Left arrow clicked!', area);
+      onClick: () => {
+        console.log('Left arrow clicked!');
         navigateToWall('left');
       }
     },
     {
       id: 'rightArrow',
       coords: "1200,300,1270,350", // Adjust these coordinates as needed
-      onClick: (area) => {
-        console.log('Right arrow clicked!', area);
+      onClick: () => {
+        console.log('Right arrow clicked!');
         navigateToWall('right');
       }
     },
@@ -83,14 +83,14 @@ const Wall1 = () => {
     {
       id: 'gate1',
       coords: "250,350,320,450", // These coordinates will be updated
-      onClick: (area) => {
+      onClick: () => {
         // Now handled by GateComponent
       }
     },
     {
       id: 'gate2',
       coords: "650,350,720,450", // These coordinates will be updated
-      onClick: (area) => {
+      onClick: () => {
         // Now handled by GateComponent
       }
     },
