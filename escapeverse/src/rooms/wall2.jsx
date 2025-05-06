@@ -9,9 +9,10 @@ const Wall2 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
+    const { isPowerOn, setIsPowerOn } = useGame(); // ✅
     const [showComputer, setShowComputer] = useState(false);
     const [showWirePuzzle, setShowWirePuzzle] = useState(false); // State to control wire puzzle visibility
-    const [isPowerOn, setIsPowerOn] = useState(false); // State to track if power is restored
+    //const [isPowerOn, setIsPowerOn] = useState(false); // State to track if power is restored
     const [showMessage, setShowMessage] = useState(false); // State to show messages
     const [message, setMessage] = useState(''); // Message content
 
@@ -24,10 +25,10 @@ const Wall2 = () => {
 
     // Handle puzzle completion
     const handlePuzzleComplete = () => {
-        setIsPowerOn(true);
+        setIsPowerOn(true); // Correct usage
         setShowWirePuzzle(false);
         displayMessage('Power restored! The monitor can now be accessed.');
-    };
+    };    
 
     // Define interactive areas specific to the wall
     const areas = [
