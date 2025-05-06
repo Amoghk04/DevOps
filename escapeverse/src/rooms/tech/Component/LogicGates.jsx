@@ -27,7 +27,6 @@ export default function LogicGatePuzzle() {
     const [answer, setAnswer] = useState("");
     const [circuit, setCircuit] = useState(null);
     const [userOutputs, setUserOutputs] = useState([]);
-    const [isOpen, setIsOpen] = useState(true);
     const overlayRef = useRef(null);
     const [successMessage, setSuccessMessage] = useState("");
 
