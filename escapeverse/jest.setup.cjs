@@ -1,6 +1,6 @@
 // jest.setup.js
 
-/* eslint-disable no-undef */
+ 
 
 /* eslint-env jest */
 const { TextEncoder, TextDecoder } = require('util');
