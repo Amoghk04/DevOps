@@ -3,7 +3,7 @@ import { useUser } from "./UserContext";
 import { auth } from "./firebase";
 import { signOut } from "firebase/auth";
 import { useEffect, useState, useRef } from "react";
-import { Moon, Sun, LogOut, UserCircle2, Instagram, Menu, ChevronLeft, ChevronRight, Heart, Users, Code } from "lucide-react";
+import { Moon, Sun, LogOut, UserCircle2, Instagram, Menu, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProfileOverlay from "./ProfileOverlay";
 
@@ -107,9 +107,16 @@ export default function LandingPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Connect</p>
               )}
               <div className={`flex gap-4 ${!sidebarExpanded && 'justify-center'}`}>
-              <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="Visit us on Github" className="hover:scale-125 transition-transform">
-                  Github
-                </a>
+              <a href="https://github.com/Amoghk04/DevOps" target="_blank" rel="noreferrer" aria-label="Visit us on Github" className="hover:scale-125 transition-transform">
+              <img
+                src={dark ? "/icons8-github.svg" : "/icons8-github.svg"}
+                alt="GitHub"
+                className="w-6 h-6"
+                style={{
+                  filter: dark ? "invert(1) contrast(0.7)" : "none",
+                }}
+              />
+              </a>
                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Visit us on Instagram" className="hover:scale-125 transition-transform">
                   <Instagram size={24} className="text-teal-600 dark:text-teal-400" />
                 </a>
@@ -264,39 +271,6 @@ export default function LandingPage() {
         </main>
         {showProfile && <ProfileOverlay onClose={() => setShowProfile(false)} />}
       </div>
-
-      {/* Static Footer for Contributions */}
-      <footer className="w-full bg-white dark:bg-gray-900 shadow-md py-4 px-6 md:px-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-3">
-              <Heart size={20} className="text-blue-500 dark:text-blue-400" />
-              <span className="text-gray-700 dark:text-gray-300 font-medium">Contributors: 24 developers from 8 countries</span>
-            </div>
-
-            <div className="flex gap-6">
-              <div className="flex items-center gap-2">
-                <Code size={18} className="text-teal-600 dark:text-teal-500" />
-                <span className="text-gray-700 dark:text-gray-300">342 commits</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Users size={18} className="text-cyan-600 dark:text-cyan-500" />
-                <span className="text-gray-700 dark:text-gray-300">16 active contributors</span>
-              </div>
-
-              <a
-                href="https://github.com/escapeverse/project"
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
-              >
-                Join the team
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
