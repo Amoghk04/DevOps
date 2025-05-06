@@ -260,17 +260,6 @@ export default function LogicGatePuzzle() {
         }
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (overlayRef.current && !overlayRef.current.contains(event.target)) {
-                setIsOpen(false);
-            }
-        };
-    
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
     // Replace the existing return statement
     return (
         <div style={{ background: "#0a0a0a", color: "#0ff", fontFamily: "monospace", textAlign: "center" }}>
