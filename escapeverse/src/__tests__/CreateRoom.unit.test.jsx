@@ -2,7 +2,6 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import CreateRoom from "../CreateRoom";
 import { BrowserRouter } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 
 // Mock uuid and navigate
 jest.mock("uuid", () => ({
