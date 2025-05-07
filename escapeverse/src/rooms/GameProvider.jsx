@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { generateCircuit } from './tech/Component/LogicGates';
 
 const GameContext = createContext();
 
@@ -10,6 +11,20 @@ export function GameProvider({ children }) {
   const [wall2GatePositions, setWall2GatePositions] = useState([]);
   const [wall3GatePositions, setWall3GatePositions] = useState([]);
   const [wall4GatePositions, setWall4GatePositions] = useState([]);
+
+  const [gateCircuits, setGateCircuits] = useState({});
+
+  const getOrCreateCircuit = (gateNumber) => {
+    if (!gateCircuits[gateNumber]) {
+      const newCircuit = generateCircuit();
+      setGateCircuits(prev => ({
+        ...prev,
+        [gateNumber]: newCircuit
+      }));
+      return newCircuit;
+    }
+    return gateCircuits[gateNumber];
+  };
 
   useEffect(() => {
     const navType = performance.getEntriesByType("navigation")[0]?.type;
@@ -32,6 +47,8 @@ export function GameProvider({ children }) {
       setWall3GatePositions,
       wall4GatePositions,
       setWall4GatePositions,
+      gateCircuits,
+      getOrCreateCircuit,
     }}>
       {children}
     </GameContext.Provider>

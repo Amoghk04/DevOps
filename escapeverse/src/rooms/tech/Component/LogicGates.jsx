@@ -22,7 +22,72 @@ const buttonStyle = {
     transition: "background-color 0.3s, color 0.3s"
 };
 
-export default function LogicGatePuzzle() {
+const gates = ["AND", "OR", "NOT"];
+
+const evaluateGate = (type, inputs) => {
+    if (type === "AND") return inputs[0] & inputs[1];
+    if (type === "OR") return inputs[0] | inputs[1];
+    if (type === "NOT") return inputs[0] ^ 1;
+};
+
+const generateGate = (id, possibleInputs) => {
+    const type = getRandomGate();
+    let ins;
+    if (type === "NOT") {
+        ins = [possibleInputs[Math.floor(Math.random() * possibleInputs.length)]];
+    } else {
+        const a = possibleInputs[Math.floor(Math.random() * possibleInputs.length)];
+        let b;
+        do {
+            b = possibleInputs[Math.floor(Math.random() * possibleInputs.length)];
+        } while (b === a);
+        ins = [a, b];
+    }
+    return { id, type, ins };
+};
+
+const generateCircuit = () => {
+    while (true) {
+        const inputs = { A: randomBool(), B: randomBool(), C: randomBool() };
+
+        const layer1 = ["G1", "G2", "G3"].map(id => generateGate(id, ["A", "B", "C"]));
+        const layer2 = ["G4", "G5", "G6"].map(id => generateGate(id, layer1.map(g => g.id)));
+        const layer3 = ["G7", "G8", "G9"].map(id => generateGate(id, layer2.map(g => g.id)));
+
+        const allGates = [...layer1, ...layer2, ...layer3];
+        const usedInputs = new Set();
+        const usedGateOutputs = new Set();
+
+        allGates.forEach(g => g.ins.forEach(input => usedInputs.add(input)));
+        const allInputsUsed = ["A", "B", "C"].every(k => usedInputs.has(k));
+
+        [...layer2, ...layer3].forEach(g => {
+            g.ins.forEach(input => {
+                if (input.startsWith("G")) usedGateOutputs.add(input);
+            });
+        });
+
+        const allLayer1Used = layer1.every(g => usedGateOutputs.has(g.id));
+        const allLayer2Used = layer2.every(g => usedGateOutputs.has(g.id));
+        const allGatesUsed = allLayer1Used && allLayer2Used;
+
+        if (allInputsUsed && allGatesUsed) {
+            const values = { ...inputs };
+            [...layer1, ...layer2, ...layer3].forEach(g => {
+                values[g.id] = evaluateGate(g.type, g.ins.map(i => values[i]));
+            });
+            const outputs = layer3.map(g => values[g.id]);
+            return { inputs, layer1, layer2, layer3, outputs };
+        }
+    }
+};
+
+export {generateCircuit}
+
+const randomBool = () => (Math.random() < 0.5 ? 0 : 1);
+const getRandomGate = () => gates[Math.floor(Math.random() * gates.length)];
+
+export default function LogicGatePuzzle({circuit: providedCircuit}) {
     const canvasRef = useRef(null);
     const [answer, setAnswer] = useState("");
     const [circuit, setCircuit] = useState(null);
@@ -33,69 +98,7 @@ export default function LogicGatePuzzle() {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
-        const gates = ["AND", "OR", "NOT"];
         const outputPositions = [];
-
-        const randomBool = () => (Math.random() < 0.5 ? 0 : 1);
-        const getRandomGate = () => gates[Math.floor(Math.random() * gates.length)];
-
-        const evaluateGate = (type, inputs) => {
-            if (type === "AND") return inputs[0] & inputs[1];
-            if (type === "OR") return inputs[0] | inputs[1];
-            if (type === "NOT") return inputs[0] ^ 1;
-        };
-
-        const generateGate = (id, possibleInputs) => {
-            const type = getRandomGate();
-            let ins;
-            if (type === "NOT") {
-                ins = [possibleInputs[Math.floor(Math.random() * possibleInputs.length)]];
-            } else {
-                const a = possibleInputs[Math.floor(Math.random() * possibleInputs.length)];
-                let b;
-                do {
-                    b = possibleInputs[Math.floor(Math.random() * possibleInputs.length)];
-                } while (b === a);
-                ins = [a, b];
-            }
-            return { id, type, ins };
-        };
-
-        const generateCircuit = () => {
-            while (true) {
-                const inputs = { A: randomBool(), B: randomBool(), C: randomBool() };
-
-                const layer1 = ["G1", "G2", "G3"].map(id => generateGate(id, ["A", "B", "C"]));
-                const layer2 = ["G4", "G5", "G6"].map(id => generateGate(id, layer1.map(g => g.id)));
-                const layer3 = ["G7", "G8", "G9"].map(id => generateGate(id, layer2.map(g => g.id)));
-
-                const allGates = [...layer1, ...layer2, ...layer3];
-                const usedInputs = new Set();
-                const usedGateOutputs = new Set();
-
-                allGates.forEach(g => g.ins.forEach(input => usedInputs.add(input)));
-                const allInputsUsed = ["A", "B", "C"].every(k => usedInputs.has(k));
-
-                [...layer2, ...layer3].forEach(g => {
-                    g.ins.forEach(input => {
-                        if (input.startsWith("G")) usedGateOutputs.add(input);
-                    });
-                });
-
-                const allLayer1Used = layer1.every(g => usedGateOutputs.has(g.id));
-                const allLayer2Used = layer2.every(g => usedGateOutputs.has(g.id));
-                const allGatesUsed = allLayer1Used && allLayer2Used;
-
-                if (allInputsUsed && allGatesUsed) {
-                    const values = { ...inputs };
-                    [...layer1, ...layer2, ...layer3].forEach(g => {
-                        values[g.id] = evaluateGate(g.type, g.ins.map(i => values[i]));
-                    });
-                    const outputs = layer3.map(g => values[g.id]);
-                    return { inputs, layer1, layer2, layer3, outputs };
-                }
-            }
-        };
 
         const drawGate = (ctx, x, y, gate) => {
             ctx.strokeStyle = "#0ff";
@@ -157,6 +160,8 @@ export default function LogicGatePuzzle() {
         };
 
         const drawCircuit = (circuit, outputsToUse) => {
+            if (!circuit || !circuit.inputs) return; // Add guard clause
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.font = "14px monospace";
             ctx.lineWidth = 2;
@@ -197,6 +202,7 @@ export default function LogicGatePuzzle() {
             drawConnections(circuit.layer3);
 
             outputPositions.length = 0; // Reset output positions
+            outputPositions.current = []; 
 
             outputsToUse.forEach((val, i) => {
                 const outputY = 100 + i * 150;
@@ -214,7 +220,7 @@ export default function LogicGatePuzzle() {
             });
         };
 
-        const c = generateCircuit();
+        var c = providedCircuit || generateCircuit();
         setCircuit(c);
         setUserOutputs(Array(c.outputs.length).fill(-1));
         drawCircuit(c, Array(c.outputs.length).fill(-1));
@@ -242,7 +248,7 @@ export default function LogicGatePuzzle() {
 
         canvas.addEventListener("click", handleClick);
         return () => canvas.removeEventListener("click", handleClick);
-    }, []);
+    }, [providedCircuit]);
 
     const revealAnswer = () => {
         if (circuit) {
@@ -255,7 +261,7 @@ export default function LogicGatePuzzle() {
         if (circuit) {
             const isCorrect = userOutputs.every((output, index) => output === circuit.outputs[index]);
             console.log("User Outputs:", userOutputs, "Correct Outputs:", circuit.outputs);
-            setSuccessMessage(isCorrect ? "✅ Gate is connected and fixed!" : "❌ Not quite right, try again!");
+            setSuccessMessage(isCorrect ? "Gate is connected and fixed!" : "Not quite right, try again!");
         }
     };
 
@@ -267,7 +273,7 @@ export default function LogicGatePuzzle() {
             <button onClick={revealAnswer} style={buttonStyle}>Reveal Answer</button>
             <button onClick={checkAnswer} style={buttonStyle}>Check Solution</button>
             <div>{answer}</div>
-            <div style={{ color: successMessage.includes("✅") ? "#0f0" : "#f00", marginTop: "10px" }}>
+            <div style={{ color: successMessage.includes("fixed") ? "#0f0" : "#f00", marginTop: "10px" }}>
                 {successMessage}
             </div>
         </div>

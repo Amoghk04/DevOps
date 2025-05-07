@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
+import { useGame } from '../../../rooms/GameProvider';
 import LogicGatePuzzle from './LogicGates';
 
 const GateComponent = ({ gatePositions, onGateClick }) => {
   const [activeGate, setActiveGate] = useState(null);
   const gateOverlayRef = useRef(null);
+  const { getOrCreateCircuit } = useGame();
 
   // Store a separate LogicGatePuzzle state per gate
   const [gatePuzzles, setGatePuzzles] = useState({});
@@ -13,15 +15,8 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
     setActiveGate(gateNumber);
 
     // Initialize puzzle state for this gate if not already
-    if (!gatePuzzles[gateNumber]) {
-      setGatePuzzles(prev => ({
-        ...prev,
-        [gateNumber]: <LogicGatePuzzle key={`puzzle-${gateNumber}`} />
-      }));
-    }
-
+    getOrCreateCircuit(gateNumber);
     if (onGateClick) onGateClick(gateNumber);
-    console.log(`Gate ${gateNumber} clicked!`);
   };
 
   // Close overlay on outside click
@@ -62,15 +57,18 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
       })}
 
       {/* Gate puzzle overlay */}
-      {/* Gate puzzle overlay */}
       {activeGate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             ref={gateOverlayRef}
-            className="bg-orange-950 w-[600px] h-[400px] rounded-xl p-4 flex flex-col items-center justify-center"
+            className="bg-orange-950 bg-opacity-80 w-[600px] h-[400px] rounded-xl p-4 flex flex-col items-center justify-center"
           >
             <div className="text-2xl text-amber-500 mb-4">Gate {activeGate} Circuit</div>
-            <LogicGatePuzzle onClose={() => setActiveGate(null)} />
+            <LogicGatePuzzle 
+              gateNumber={activeGate} 
+              onClose={() => setActiveGate(null)}
+              circuit={getOrCreateCircuit(activeGate)}
+            />
           </div>
         </div>
       )}
