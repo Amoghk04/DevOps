@@ -18,6 +18,8 @@ export function GameProvider({ children }) {
 
   const [gateCircuits, setGateCircuits] = useState({});
 
+  const [lightCode, setLightCode] = useState('');
+
   const saveGateOutputs = (gateNumber, outputs) => {
     setGateOutputStates(prev => ({
       ...prev,
@@ -74,6 +76,8 @@ export function GameProvider({ children }) {
       saveGateOutputs,
       gateActiveStates,
       setGateActiveState,
+      lightCode,
+      setLightCode
     }}>
       {children}
     </GameContext.Provider>

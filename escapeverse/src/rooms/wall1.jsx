@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';
 import GateComponent from './tech/Component/GateComponent';
 
@@ -9,12 +9,12 @@ const Wall1 = () => {
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
-  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions } = useGame();
+  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions, lightCode } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [shake, setShake] = useState(false);
-  
+
   // Store whether the areas have been updated
   const [areasUpdated, setAreasUpdated] = useState(false);
 
@@ -101,15 +101,22 @@ const Wall1 = () => {
         // Now handled by GateComponent
       }
     },
+    {
+      id: 'gate4', // Add this new gate
+      coords: "850,350,920,450",
+      onClick: () => {
+        // Now handled by GateComponent
+      }
+    }
   ]);
-  
+
   // Generate gate positions on component mount if they don't exist in context
   useEffect(() => {
     // Only generate positions if they don't already exist in the game context
     if (wall1GatePositions && wall1GatePositions.length > 0) {
       return; // Positions already exist, no need to generate
     }
-    
+
     // Generate new random positions
     // Define the boundaries for gate placement
     const minLeftPosition = 120; // Minimum left position
@@ -133,7 +140,7 @@ const Wall1 = () => {
     const overlapsWithStatic = (position, width = 70, height = 100) => {
       // Add a buffer zone around static elements
       const buffer = 30;
-      
+
       for (const element of staticElements) {
         // Check for overlap with buffer zone
         if (
@@ -157,52 +164,52 @@ const Wall1 = () => {
 
     // Generate positions, ensuring they don't overlap with static elements or each other
     const positions = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       let newPosition;
       let overlap;
-      
+
       do {
         overlap = false;
         newPosition = generateRandomPosition();
-        
+
         // Check if this position overlaps with static elements
         if (overlapsWithStatic(newPosition)) {
           overlap = true;
           continue;
         }
-        
+
         // Check if this position overlaps with any existing gate positions
         for (const pos of positions) {
           // Define a minimum distance between gates
           const minDistance = 150;
           const distance = Math.sqrt(
-            Math.pow(newPosition.left - pos.left, 2) + 
+            Math.pow(newPosition.left - pos.left, 2) +
             Math.pow(newPosition.top - pos.top, 2)
           );
-          
+
           if (distance < minDistance) {
             overlap = true;
             break;
           }
         }
       } while (overlap);
-      
+
       positions.push(newPosition);
     }
 
     // Save the new positions to game context instead of localStorage
     setWall1GatePositions(positions);
   }, [wall1GatePositions, setWall1GatePositions]);
-  
+
   // Update the area coordinates for gates whenever wall1GatePositions changes
   useEffect(() => {
     if (wall1GatePositions.length > 0 && !areasUpdated) {
       // Create a copy of the areas array
       const newAreas = [...areas];
-      
+
       // Update coordinates for each gate
-      for (let i = 0; i < 3; i++) {
-        const gateIndex = newAreas.findIndex(area => area.id === `gate${i+1}`);
+      for (let i = 0; i < 4; i++) {
+        const gateIndex = newAreas.findIndex(area => area.id === `gate${i + 1}`);
         if (gateIndex !== -1) {
           const pos = wall1GatePositions[i];
           // Create a new object for this area with updated coords
@@ -212,7 +219,7 @@ const Wall1 = () => {
           };
         }
       }
-      
+
       // Update the areas state with the new array
       setAreas(newAreas);
       setAreasUpdated(true);
@@ -288,14 +295,14 @@ const Wall1 = () => {
         />
 
         {/* Use GateComponent to render gates */}
-        <GateComponent 
+        <GateComponent
           gatePositions={wall1GatePositions}
           onGateClick={handleGateClick}
         />
 
         {/* Arrow Navigation Indicators */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
-          <div 
+          <div
             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
             onClick={() => navigateToWall('left')}
           >
@@ -306,7 +313,7 @@ const Wall1 = () => {
         </div>
 
         <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
-          <div 
+          <div
             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
             onClick={() => navigateToWall('right')}
           >
@@ -329,11 +336,9 @@ const Wall1 = () => {
       </div>
 
       {/* overlay for light at center */}
+      // Modify the button onClick handler in the input overlay section:
       {showInputOverlay && (
-        <div
-          className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono"
-          onClick={(e) => e.stopPropagation()} // prevent bubbling
-        >
+        <div className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono">
           <div ref={overlayRef} className="bg-black p-6 rounded-lg border-4 border-white w-96">
             {isDark ? (
               <>
@@ -347,7 +352,14 @@ const Wall1 = () => {
                 />
                 <button
                   onClick={() => {
-                    if (userInput.toLowerCase().trim() === 'light') {
+                    // Get the wall1_code from game context
+                    console.log('Light code:', lightCode);
+                    if(!userInput) {
+                      setShake(true);
+                      setTimeout(() => setShake(false), 500);
+                      return;
+                    }
+                    else if (userInput.toLowerCase().trim() === lightCode.toLowerCase()) {
                       setIsDark(false);
                       setShowInputOverlay(false);
                     } else {

@@ -23,6 +23,29 @@ const buttonStyle = {
     transition: "background-color 0.3s, color 0.3s"
 };
 
+// Final code button style with more prominent appearance
+const finalCodeButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: "#111",
+    color: "#fff",
+    border: "2px solid #0ff",
+    padding: "15px 30px",
+    fontSize: "18px",
+    fontWeight: "bold",
+    boxShadow: "0 0 15px #0ff",
+    marginTop: "20px"
+};
+
+const finalCodeDisplayStyle = {
+    marginTop: "30px",
+    padding: "20px",
+    border: "2px solid #0ff",
+    borderRadius: "5px",
+    backgroundColor: "#111",
+    display: "inline-block",
+    boxShadow: "0 0 20px #0ff"
+};
+
 const gates = ["AND", "OR", "NOT"];
 
 const evaluateGate = (type, inputs) => {
@@ -83,19 +106,52 @@ const generateCircuit = () => {
     }
 };
 
-export {generateCircuit}
+export { generateCircuit }
 
 const randomBool = () => (Math.random() < 0.5 ? 0 : 1);
 const getRandomGate = () => gates[Math.floor(Math.random() * gates.length)];
 
-export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) {
+export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }) {
     const canvasRef = useRef(null);
     const [answer, setAnswer] = useState("");
     const [circuit, setCircuit] = useState(null);
     const [userOutputs, setUserOutputs] = useState([]);
     const [successMessage, setSuccessMessage] = useState("");
-    const { gateActiveStates, setGateActiveState, gateOutputStates, saveGateOutputs } = useGame(); 
+    const [showFinalCode, setShowFinalCode] = useState(false);
+    const {
+        gateActiveStates,
+        setGateActiveState,
+        gateOutputStates,
+        saveGateOutputs,
+        setLightCode,
+        lightCode
+    } = useGame();
     const outputPositionsRef = useRef([]);
+
+    // Check if all gates are solved
+    const allGatesSolved = React.useMemo(() => {
+        if (!gateActiveStates) return false;
+
+        // Assuming we have gates 1, 2, and 3
+        return gateActiveStates["1"] && gateActiveStates["2"] && gateActiveStates["3"] && gateActiveStates["4"];
+    }, [gateActiveStates]);
+
+    const binaryToHex = (binaryStr) => {
+        // Pad the binary string to multiple of 4
+        const padded = binaryStr.padStart(Math.ceil(binaryStr.length / 4) * 4, '0');
+
+        // Convert to hexadecimal
+        let hexStr = '';
+        for (let i = 0; i < padded.length; i += 4) {
+            const chunk = padded.substr(i, 4);
+            const decimal = parseInt(chunk, 2);
+            hexStr += decimal.toString(16).toUpperCase();
+        }
+
+        setLightCode(hexStr); // Save the hex code to lightCode state
+        console.log("Light Code:", hexStr); // Log the hex code for debugging
+        return hexStr;
+    };
 
     useEffect(() => {
         // Load the saved state if available, otherwise initialize with -1s
@@ -104,7 +160,7 @@ export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) 
             const initialOutputs = savedOutputs || Array(providedCircuit.outputs.length).fill(-1);
             setUserOutputs(initialOutputs);
             setCircuit(providedCircuit);
-            
+
             // Check if this gate is already completed
             if (gateActiveStates?.[gateNumber]) {
                 setSuccessMessage("Gate is connected and fixed!");
@@ -114,7 +170,7 @@ export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) 
 
     useEffect(() => {
         if (!canvasRef.current || !circuit) return;
-        
+
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
@@ -240,6 +296,9 @@ export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) 
         drawCircuit();
 
         const handleClick = (e) => {
+            // If gate is already solved, don't allow changes
+            if (gateActiveStates?.[gateNumber]) return;
+
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -251,7 +310,7 @@ export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) 
                     const newOutputs = [...userOutputs];
                     // Toggle between -1, 0, and 1
                     newOutputs[index] = newOutputs[index] === -1 ? 1 : (newOutputs[index] === 1 ? 0 : 1);
-                    
+
                     // Save the updated outputs to game state
                     saveGateOutputs(gateNumber, newOutputs);
                     setUserOutputs(newOutputs);
@@ -264,12 +323,12 @@ export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) 
         return () => canvas.removeEventListener("click", handleClick);
     }, [circuit, userOutputs, gateNumber, saveGateOutputs]);
 
-    // Draw circuit when userOutputs change
+    // Draw circuit when userOutputs change or gate active state changes
     useEffect(() => {
         if (circuit && canvasRef.current) {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext("2d");
-            
+
             // Redraw the circuit with updated outputs
             const drawCircle = (ctx, x, y, value, op) => {
                 ctx.beginPath();
@@ -281,42 +340,132 @@ export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) 
                 }
                 ctx.fill();
                 ctx.stroke();
+
+                // If this is an output and the gate is solved, add a lock indicator
+                if (op === "output" && gateActiveStates?.[gateNumber]) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = "#fff";
+                    ctx.lineWidth = 1;
+                    // Draw a small lock symbol
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.stroke();
+                    ctx.fillStyle = "#fff";
+                    ctx.fillRect(x - 2, y - 4, 4, 8);
+                }
             };
-            
+
             // Update just the output circles
             userOutputs.forEach((val, i) => {
                 const outputY = 100 + i * 150;
                 drawCircle(ctx, 1130, outputY, val, "output");
             });
         }
-    }, [userOutputs, circuit]);
+    }, [userOutputs, circuit, gateActiveStates, gateNumber]);
 
-    const revealAnswer = () => {
-        if (circuit) {
+    /*const revealAnswer = () => {
+        if (circuit && !gateActiveStates?.[gateNumber]) {
             setAnswer("Correct Output: " + circuit.outputs.join(" "));
         }
+    };*/
+
+    // Function to generate wall1_code from all gate outputs
+    const generateWallCode = () => {
+        // Get all the active gate numbers (sorted to ensure consistent order)
+        const activeGateNumbers = Object.keys(gateActiveStates || {})
+            .filter(gate => gateActiveStates[gate])
+            .sort();
+
+        // Combine all outputs from active gates into a single string
+        let code = '';
+        activeGateNumbers.forEach(gate => {
+            const outputs = gateOutputStates[gate];
+            if (outputs) {
+                // Convert outputs to binary digits and append to code
+                outputs.forEach(output => {
+                    // Only include 0 and 1 values, skip any -1 (unselected)
+                    if (output !== -1) {
+                        code += output;
+                    }
+                });
+            }
+        });
+
+        return code;
     };
 
     const checkAnswer = () => {
-        if (circuit) {
+        if (circuit && !gateActiveStates?.[gateNumber]) {
             const isCorrect = userOutputs.every((output, index) => output === circuit.outputs[index]);
             setSuccessMessage(isCorrect ? "Gate is connected and fixed!" : "Not quite right, try again!");
-            
-            if(isCorrect) {
+
+            if (isCorrect) {
                 // Set this specific gate as active
                 setGateActiveState(gateNumber, true);
                 // Make sure to save the correct outputs
                 saveGateOutputs(gateNumber, userOutputs);
+
+                // Generate and update the wall code
+                setTimeout(() => {
+                    // We use setTimeout to ensure state updates have propagated
+                    const newWallCode = generateWallCode();
+                    setWall1Code(newWallCode);
+                }, 0);
             }
         }
+    };
+
+    // Function to display the final wall code
+    const showFinalWallCode = () => {
+        setShowFinalCode(true);
+    };
+
+    // Get the complete final code in gate order
+    const getFinalCode = () => {
+        // Get gates in order: 1, 2, 3
+        const orderedGateNumbers = ["1", "2", "3", "4"];
+        let finalCode = '';
+
+        orderedGateNumbers.forEach(gate => {
+            const outputs = gateOutputStates[gate];
+            if (outputs) {
+                outputs.forEach(output => {
+                    if (output !== -1) {
+                        finalCode += output;
+                    }
+                });
+            }
+        });
+
+        return finalCode;
     };
 
     return (
         <div style={{ background: "#0a0a0a", color: "#0ff", fontFamily: "monospace", textAlign: "center" }}>
             <canvas ref={canvasRef} width="1200" height="500" style={canvasStyle}></canvas>
             <br />
-            <button onClick={revealAnswer} style={buttonStyle}>Reveal Answer</button>
-            <button onClick={checkAnswer} style={buttonStyle}>Check Solution</button>
+            {/*<button
+                onClick={revealAnswer}
+                style={{
+                    ...buttonStyle,
+                    opacity: gateActiveStates?.[gateNumber] ? 0.5 : 1,
+                    cursor: gateActiveStates?.[gateNumber] ? "not-allowed" : "pointer"
+                }}
+                disabled={gateActiveStates?.[gateNumber]}
+            >
+                Reveal Answer
+            </button>
+            */}
+            <button
+                onClick={checkAnswer}
+                style={{
+                    ...buttonStyle,
+                    opacity: gateActiveStates?.[gateNumber] ? 0.5 : 1,
+                    cursor: gateActiveStates?.[gateNumber] ? "not-allowed" : "pointer"
+                }}
+                disabled={gateActiveStates?.[gateNumber]}
+            >
+                Check Solution
+            </button>
             <div>{answer}</div>
             {gateActiveStates && gateActiveStates[gateNumber] ? (
                 <div style={{ color: "#0f0", marginTop: "10px" }}>
@@ -325,6 +474,46 @@ export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) 
             ) : (
                 <div style={{ color: successMessage ? (successMessage.includes("Not quite") ? "#f00" : "#0f0") : "" }}>
                     {successMessage}
+                </div>
+            )}
+
+            {/* Final Code Button - only show when all gates are solved */}
+            {allGatesSolved && !showFinalCode && (
+                <div style={{ marginTop: "30px" }}>
+                    <button
+                        onClick={showFinalWallCode}
+                        style={finalCodeButtonStyle}
+                    >
+                        REVEAL FINAL WALL CODE
+                    </button>
+                </div>
+            )}
+
+            {/* Final Code Display - only show after button is clicked */}
+            {showFinalCode && allGatesSolved && (
+                <div style={finalCodeDisplayStyle}>
+                    <div style={{ fontSize: "18px", color: "#0ff", marginBottom: "10px" }}>
+                        FINAL WALL CODE:
+                    </div>
+                    <div style={{
+                        fontSize: "32px",
+                        letterSpacing: "8px",
+                        fontWeight: "bold",
+                        color: "#fff",
+                        textShadow: "0 0 10px #0ff"
+                    }}>
+                        {getFinalCode()}
+                    </div>
+                    <div style={{
+                        fontSize: "24px",
+                        letterSpacing: "6px",
+                        fontWeight: "bold",
+                        color: "#0ff",
+                        marginTop: "15px",
+                        textShadow: "0 0 8px #0ff"
+                    }}>
+                        HEX: {binaryToHex(getFinalCode())}
+                    </div>
                 </div>
             )}
         </div>
