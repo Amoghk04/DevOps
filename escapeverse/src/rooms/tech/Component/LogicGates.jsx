@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useGame } from "../../../rooms/GameProvider";
 
 const canvasStyle = {
     marginTop: "20px",
@@ -87,18 +88,35 @@ export {generateCircuit}
 const randomBool = () => (Math.random() < 0.5 ? 0 : 1);
 const getRandomGate = () => gates[Math.floor(Math.random() * gates.length)];
 
-export default function LogicGatePuzzle({circuit: providedCircuit}) {
+export default function LogicGatePuzzle({circuit: providedCircuit, gateNumber}) {
     const canvasRef = useRef(null);
     const [answer, setAnswer] = useState("");
     const [circuit, setCircuit] = useState(null);
     const [userOutputs, setUserOutputs] = useState([]);
     const [successMessage, setSuccessMessage] = useState("");
+    const { gateActiveStates, setGateActiveState, gateOutputStates, saveGateOutputs } = useGame(); 
+    const outputPositionsRef = useRef([]);
 
     useEffect(() => {
+        // Load the saved state if available, otherwise initialize with -1s
+        if (providedCircuit) {
+            const savedOutputs = gateOutputStates?.[gateNumber];
+            const initialOutputs = savedOutputs || Array(providedCircuit.outputs.length).fill(-1);
+            setUserOutputs(initialOutputs);
+            setCircuit(providedCircuit);
+            
+            // Check if this gate is already completed
+            if (gateActiveStates?.[gateNumber]) {
+                setSuccessMessage("Gate is connected and fixed!");
+            }
+        }
+    }, [providedCircuit, gateNumber, gateOutputStates, gateActiveStates]);
+
+    useEffect(() => {
+        if (!canvasRef.current || !circuit) return;
+        
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
-
-        const outputPositions = [];
 
         const drawGate = (ctx, x, y, gate) => {
             ctx.strokeStyle = "#0ff";
@@ -159,9 +177,7 @@ export default function LogicGatePuzzle({circuit: providedCircuit}) {
             ctx.stroke();
         };
 
-        const drawCircuit = (circuit, outputsToUse) => {
-            if (!circuit || !circuit.inputs) return; // Add guard clause
-
+        const drawCircuit = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.font = "14px monospace";
             ctx.lineWidth = 2;
@@ -201,13 +217,14 @@ export default function LogicGatePuzzle({circuit: providedCircuit}) {
             drawConnections(circuit.layer2);
             drawConnections(circuit.layer3);
 
-            outputPositions.length = 0; // Reset output positions
-            outputPositions.current = []; 
+            // Reset output positions
+            outputPositionsRef.current = [];
 
-            outputsToUse.forEach((val, i) => {
+            // Draw outputs based on userOutputs state
+            userOutputs.forEach((val, i) => {
                 const outputY = 100 + i * 150;
                 drawCircle(ctx, 1130, outputY, val, "output");
-                outputPositions.push({ x: 1130, y: outputY, index: i });
+                outputPositionsRef.current.push({ x: 1130, y: outputY, index: i });
             });
 
             circuit.layer3.forEach((g, i) => {
@@ -220,27 +237,24 @@ export default function LogicGatePuzzle({circuit: providedCircuit}) {
             });
         };
 
-        var c = providedCircuit || generateCircuit();
-        setCircuit(c);
-        setUserOutputs(Array(c.outputs.length).fill(-1));
-        drawCircuit(c, Array(c.outputs.length).fill(-1));
+        drawCircuit();
 
         const handleClick = (e) => {
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            for (let { x: cx, y: cy, index } of outputPositions) {
+            for (let { x: cx, y: cy, index } of outputPositionsRef.current) {
                 const dx = x - cx;
                 const dy = y - cy;
                 if (dx * dx + dy * dy <= 100) {
-                    setUserOutputs(prev => {
-                        const newOutputs = [...prev];
-                        // Change this line to properly initialize value if it's -1
-                        newOutputs[index] = newOutputs[index] === -1 ? 1 : (newOutputs[index] === 1 ? 0 : 1);
-                        drawCircuit(c, newOutputs);
-                        return newOutputs;
-                    });
+                    const newOutputs = [...userOutputs];
+                    // Toggle between -1, 0, and 1
+                    newOutputs[index] = newOutputs[index] === -1 ? 1 : (newOutputs[index] === 1 ? 0 : 1);
+                    
+                    // Save the updated outputs to game state
+                    saveGateOutputs(gateNumber, newOutputs);
+                    setUserOutputs(newOutputs);
                     break;
                 }
             }
@@ -248,7 +262,34 @@ export default function LogicGatePuzzle({circuit: providedCircuit}) {
 
         canvas.addEventListener("click", handleClick);
         return () => canvas.removeEventListener("click", handleClick);
-    }, [providedCircuit]);
+    }, [circuit, userOutputs, gateNumber, saveGateOutputs]);
+
+    // Draw circuit when userOutputs change
+    useEffect(() => {
+        if (circuit && canvasRef.current) {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            
+            // Redraw the circuit with updated outputs
+            const drawCircle = (ctx, x, y, value, op) => {
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                if (op === "input") {
+                    ctx.fillStyle = value === 1 ? "#0f0" : "#f00";
+                } else {
+                    ctx.fillStyle = value === -1 ? "white" : (value === 1 ? "#0f0" : "#f00");
+                }
+                ctx.fill();
+                ctx.stroke();
+            };
+            
+            // Update just the output circles
+            userOutputs.forEach((val, i) => {
+                const outputY = 100 + i * 150;
+                drawCircle(ctx, 1130, outputY, val, "output");
+            });
+        }
+    }, [userOutputs, circuit]);
 
     const revealAnswer = () => {
         if (circuit) {
@@ -256,16 +297,20 @@ export default function LogicGatePuzzle({circuit: providedCircuit}) {
         }
     };
 
-    // Add this before the return statement
     const checkAnswer = () => {
         if (circuit) {
             const isCorrect = userOutputs.every((output, index) => output === circuit.outputs[index]);
-            console.log("User Outputs:", userOutputs, "Correct Outputs:", circuit.outputs);
             setSuccessMessage(isCorrect ? "Gate is connected and fixed!" : "Not quite right, try again!");
+            
+            if(isCorrect) {
+                // Set this specific gate as active
+                setGateActiveState(gateNumber, true);
+                // Make sure to save the correct outputs
+                saveGateOutputs(gateNumber, userOutputs);
+            }
         }
     };
 
-    // Replace the existing return statement
     return (
         <div style={{ background: "#0a0a0a", color: "#0ff", fontFamily: "monospace", textAlign: "center" }}>
             <canvas ref={canvasRef} width="1200" height="500" style={canvasStyle}></canvas>
@@ -273,9 +318,15 @@ export default function LogicGatePuzzle({circuit: providedCircuit}) {
             <button onClick={revealAnswer} style={buttonStyle}>Reveal Answer</button>
             <button onClick={checkAnswer} style={buttonStyle}>Check Solution</button>
             <div>{answer}</div>
-            <div style={{ color: successMessage.includes("fixed") ? "#0f0" : "#f00", marginTop: "10px" }}>
-                {successMessage}
-            </div>
+            {gateActiveStates && gateActiveStates[gateNumber] ? (
+                <div style={{ color: "#0f0", marginTop: "10px" }}>
+                    Gate is connected and fixed!
+                </div>
+            ) : (
+                <div style={{ color: successMessage ? (successMessage.includes("Not quite") ? "#f00" : "#0f0") : "" }}>
+                    {successMessage}
+                </div>
+            )}
         </div>
     );
 }

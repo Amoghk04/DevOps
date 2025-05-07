@@ -6,6 +6,10 @@ const GameContext = createContext();
 export function GameProvider({ children }) {
   const [isDark, setIsDark] = useState(true);
   const [isPowerOn, setIsPowerOn] = useState(false);
+  
+  const [isGateActive, setIsGateActive] = useState(false);
+  const [gateOutputStates, setGateOutputStates] = useState({}); // Add this new state
+  const [gateActiveStates, setGateActiveStates] = useState({});
 
   const [wall1GatePositions, setWall1GatePositions] = useState([]);
   const [wall2GatePositions, setWall2GatePositions] = useState([]);
@@ -13,6 +17,21 @@ export function GameProvider({ children }) {
   const [wall4GatePositions, setWall4GatePositions] = useState([]);
 
   const [gateCircuits, setGateCircuits] = useState({});
+
+  const saveGateOutputs = (gateNumber, outputs) => {
+    setGateOutputStates(prev => ({
+      ...prev,
+      [gateNumber]: outputs
+    }));
+  };
+
+  // Function to set a specific gate's active state
+  const setGateActiveState = (gateNumber, isActive) => {
+    setGateActiveStates(prev => ({
+        ...prev,
+        [gateNumber]: isActive
+    }));
+};
 
   const getOrCreateCircuit = (gateNumber) => {
     if (!gateCircuits[gateNumber]) {
@@ -49,6 +68,12 @@ export function GameProvider({ children }) {
       setWall4GatePositions,
       gateCircuits,
       getOrCreateCircuit,
+      isGateActive,
+      setIsGateActive,
+      gateOutputStates,
+      saveGateOutputs,
+      gateActiveStates,
+      setGateActiveState,
     }}>
       {children}
     </GameContext.Provider>

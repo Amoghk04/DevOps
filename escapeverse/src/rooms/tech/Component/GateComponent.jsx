@@ -7,9 +7,6 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
   const gateOverlayRef = useRef(null);
   const { getOrCreateCircuit } = useGame();
 
-  // Store a separate LogicGatePuzzle state per gate
-  const [gatePuzzles, setGatePuzzles] = useState({});
-
   // Handle gate click
   const handleGateClick = (gateNumber) => {
     setActiveGate(gateNumber);
