@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';
+import TileGrid from './tech/Component/Tiles';
 
 const Wall4 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
     const [currentImage, setCurrentImage] = useState("/wall4-closed.png");
+    const [showTileGrid, setShowTileGrid] = useState(false); // State to control tile grid visibility
 
     // Define interactive areas specific to the left wall
     const areas = [
@@ -17,6 +19,7 @@ const Wall4 = () => {
             coords: "453,76,811,78,812,520,454,522",
             onClick: () => {
                 console.log('server-1 clicked!');
+                setShowTileGrid(true); // Show the tile grid when window is clicked
             },
         },
         {
@@ -46,6 +49,11 @@ const Wall4 = () => {
         }
     ]
 
+    // Close the tile grid puzzle
+    const handleCloseTileGrid = () => {
+        setShowTileGrid(false);
+    };
+
     useEffect(() => {
         const handleMouseMove = (e) => {
             setMousePos({ x: e.clientX, y: e.clientY });
@@ -60,10 +68,10 @@ const Wall4 = () => {
 
     return (
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-      <div className="relative w-full h-full">
+            <div className="relative w-full h-full">
                 <InteractiveImageMap
                     imageSrc={currentImage}
-                areas={currentImage === "/wall4.png" ? areas : areas1}
+                    areas={currentImage === "/wall4.png" ? areas : areas1}
                     fullscreenOnMount={true}
                     showDebug={true}
                     className="w-full h-full object-cover"
@@ -92,6 +100,26 @@ const Wall4 = () => {
                     </div>
                 </div>
 
+                {/* Tile Grid Modal */}
+                {showTileGrid && (
+                    <div className="absolute inset-0 flex items-center justify-center z-20">
+                        <div className="bg-black bg-opacity-70 absolute inset-0" onClick={handleCloseTileGrid}></div>
+                        <div className="bg-white rounded-xl p-6 shadow-2xl relative z-30 max-w-2xl">
+                            <button 
+                                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                                onClick={handleCloseTileGrid}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <div className="text-center mb-4">
+                            </div>
+                            <TileGrid />
+                        </div>
+                    </div>
+                )}
+
                 {/* Torchlight overlay */}
                 {isDark && (
                     <div
@@ -103,8 +131,6 @@ const Wall4 = () => {
                     ></div>
                 )}
             </div>
-
-            {/* Add any interactive overlays specific to the left wall here */}
         </div>
     );
 };
