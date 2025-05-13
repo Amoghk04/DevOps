@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Terminal, TerminalIcon, XCircle, Power, Folder, FilePlus, Monitor, FileText, Settings, HardDrive } from 'lucide-react';
+import { Terminal, TerminalIcon, XCircle, Power, Folder, Monitor, FileText, HardDrive } from 'lucide-react';
 import TicTacToe from './TicTacToe';
+import { useGame } from '../../GameProvider';
 
 const ComputerScreen = ({ isOpen, onClose }) => {
   const [isOn, setIsOn] = useState(false);
@@ -31,6 +32,7 @@ PS: take me back to where my home is, I shall give you the passkey.`, hidden: tr
   ]);
   const [openFile, setOpenFile] = useState(null);
   const [time, setTime] = useState(new Date());
+  const { serverRoomKey, setServerRoomKey } = useGame();
 
 hasDecryptedFile, wall2Number;
 
@@ -78,6 +80,7 @@ hasDecryptedFile, wall2Number;
         type: 'system',
         content: `The final key is: ${randomNumber}`
       };
+      setServerRoomKey(randomNumber.toString());
     } else if (command === 'openssl enc -d access_codes.dat') {
       setHasDecryptedFile(true);
       const updatedFiles = files.map(file => 

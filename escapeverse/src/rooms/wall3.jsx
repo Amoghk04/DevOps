@@ -2,11 +2,16 @@ import { useState, useEffect } from 'react';
 import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';
+import ServerScreen from './tech/Component/ServerScreen';
+import CodePrompt from './tech/Component/codePrompt';
 
 const Wall2 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
+    const { serverRoomKey } = useGame();
+    const [showServerScreen, setShowServerScreen ] = useState(false);
+    const [showCodePrompt, setShowCodePrompt] = useState(false);
 
     // Define interactive areas specific to the left wall
     const areas = [
@@ -16,6 +21,8 @@ const Wall2 = () => {
             coords: "148,140,400,141,402,639,150,640",
             onClick: () => {
                 console.log('server-1 clicked!');
+                console.log(`${serverRoomKey}`)
+                setShowCodePrompt(true);
             }
         },
         {
@@ -34,6 +41,11 @@ const Wall2 = () => {
         },
         // Add more interactive areas specific to the left wall here
     ];
+
+    const handleCodeSuccess = () => {
+        setShowCodePrompt(false);
+        setShowServerScreen(true);
+    }
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -56,6 +68,19 @@ const Wall2 = () => {
                     fullscreenOnMount={true}
                     showDebug={true}
                     className="w-full h-full object-cover"
+                />
+                
+                <CodePrompt
+                    isOpen={showCodePrompt}
+                    onClose={() => setShowCodePrompt(false)}
+                    onSubmit={handleCodeSuccess}
+                    correctCode={serverRoomKey}
+                />
+                
+                {/* Server Screen Component */}
+                <ServerScreen
+                    isOpen={showServerScreen}
+                    onClose={() => setShowServerScreen(false)}
                 />
 
                 {/* Right Arrow Navigation Indicator */}

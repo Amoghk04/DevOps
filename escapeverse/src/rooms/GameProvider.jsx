@@ -21,6 +21,7 @@ export function GameProvider({ children }) {
   const [lightCode, setLightCode] = useState('');
 
   const [generatedPattern, setGeneratedPattern] = useState('');
+  const [serverRoomKey, setServerRoomKey] = useState('');
 
   const saveGateOutputs = (gateNumber, outputs) => {
     setGateOutputStates(prev => ({
@@ -82,6 +83,8 @@ export function GameProvider({ children }) {
       setLightCode,
       generatedPattern,
       setGeneratedPattern,
+      serverRoomKey,
+      setServerRoomKey
     }}>
       {children}
     </GameContext.Provider>

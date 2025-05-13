@@ -144,7 +144,7 @@ export default function LandingPage() {
                 className="p-3 rounded-full bg-white/20 dark:bg-gray-800/30 backdrop-blur-md hover:bg-white/30 dark:hover:bg-gray-800/50 transition-all duration-300 shadow-lg"
                 aria-label="Toggle Theme"
               >
-                {dark ? <Sun className="text-yellow-300" /> : <Moon className="text-blue-300" />}
+                {dark ? <Sun className="text-yellow-300" /> : <Moon className="text-blue-900" />}
               </button>
               <button
                 onClick={handleSignOut}
