@@ -20,6 +20,7 @@ export function GameProvider({ children }) {
   const [isBgmPlaying, setIsBgmPlaying] = useState(false);
 
   const audioRef = useRef(null); // New ref for audio
+  const errorAudioRef = useRef(null); // New ref for error sound
 
   const saveGateOutputs = (gateNumber, outputs) => {
     setGateOutputStates(prev => ({
@@ -57,6 +58,16 @@ export function GameProvider({ children }) {
       setIsBgmPlaying(true); // Ensure it's playing and not paused
     }
   };
+
+  const playErrorSound = () => {
+  if (errorAudioRef.current) {
+    errorAudioRef.current.currentTime = 0; // Rewind to start
+    errorAudioRef.current.play().catch((e) => {
+      console.log("Error sound failed to play:", e);
+    });
+  }
+};
+
 
   useEffect(() => {
     const navType = performance.getEntriesByType("navigation")[0]?.type;
@@ -104,10 +115,12 @@ export function GameProvider({ children }) {
       serverRoomKey,
       setServerRoomKey,
       isBgmPlaying,
-      playBackgroundMusic
+      playBackgroundMusic,
+      playErrorSound,
     }}>
-      {/* 🔊 Hidden background audio element */}
+      {/* Audio element */}
       <audio ref={audioRef} src="/bgm.mp3" />
+      <audio ref={errorAudioRef} src="/error.mp3" />
       {children}
     </GameContext.Provider>
   );

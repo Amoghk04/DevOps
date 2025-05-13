@@ -9,11 +9,12 @@ const Wall2 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
-    const { isPowerOn, setIsPowerOn } = useGame(); 
+    const { isPowerOn, setIsPowerOn } = useGame();
     const [showComputer, setShowComputer] = useState(false);
     const [showWirePuzzle, setShowWirePuzzle] = useState(false); // State to control wire puzzle visibility
     const [showMessage, setShowMessage] = useState(false); // State to show messages
     const [message, setMessage] = useState(''); // Message content
+    const { playErrorSound } = useGame();
 
     // Display message function
     const displayMessage = (text, duration = 3000) => {
@@ -27,7 +28,7 @@ const Wall2 = () => {
         setIsPowerOn(true); // Correct usage
         setShowWirePuzzle(false);
         displayMessage('Power restored! The monitor can now be accessed.');
-    };    
+    };
 
     // Define interactive areas specific to the wall
     const areas = [
@@ -37,6 +38,7 @@ const Wall2 = () => {
             onClick: () => {
                 if (!isPowerOn) {
                     displayMessage('ERROR: No power!');
+                    playErrorSound(); // Play error sound
                 } else {
                     setShowComputer(true); // Show the computer screen when the monitor is clicked
                 }
