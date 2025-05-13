@@ -32,7 +32,7 @@ PS: take me back to where my home is, I shall give you the passkey.`, hidden: tr
   ]);
   const [openFile, setOpenFile] = useState(null);
   const [time, setTime] = useState(new Date());
-  const { playErrorSound, setServerRoomKey } = useGame();
+  const { setServerRoomKey } = useGame();
 
 hasDecryptedFile, wall2Number;
 
