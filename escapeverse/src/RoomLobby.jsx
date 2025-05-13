@@ -2,7 +2,6 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { UserContext } from "./UserContext"; // Import your UserContext
-import { useGame } from "./rooms/GameProvider";
 
 function RoomLobby() {
   const { roomId } = useParams();
@@ -16,7 +15,6 @@ function RoomLobby() {
   const navigate = useNavigate();
   const socketRef = useRef(null);
   const joinedRef = useRef(false);
-  const { playBackgroundMusic } = useGame(); // Access the playBackgroundMusic function from GameProvider
 
   useEffect(() => {
     console.log("Room Lobby rendered. Path:", window.location.pathname);

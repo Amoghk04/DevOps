@@ -78,7 +78,7 @@ export function GameProvider({ children }) {
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.5;
+      audioRef.current.volume = 0.3;
       audioRef.current.loop = true; // Ensure it loops
       audioRef.current.play().catch((e) => {
         console.log("Autoplay failed:", e);
