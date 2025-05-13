@@ -427,12 +427,12 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         return finalCode;
     };
 
-    /*const revealAnswer = () => {
+    const revealAnswer = () => {
         if (circuit && !gateActiveStates?.[gateNumber]) {
             setAnswer("Correct Output: " + circuit.outputs.join(" "));
         }
     };
-    */
+    
     return (
         <div style={{ background: "#0a0a0a", color: "#0ff", fontFamily: "monospace", textAlign: "center" }}>
             <canvas ref={canvasRef} width="1200" height="500" style={canvasStyle}></canvas>

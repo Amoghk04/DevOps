@@ -337,30 +337,56 @@ const Wall1 = () => {
       </div>
 
       {/* overlay for light at center */}
-      // Modify the button onClick handler in the input overlay section:
       {showInputOverlay && (
         <div className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono">
           <div ref={overlayRef} className="bg-black p-6 rounded-lg border-4 border-white w-96">
             {isDark ? (
               <>
-                <div className="mb-4 text-xl">Enter the command to lift the darkness:</div>
-                <input
-                  type="text"
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  className={`p-2 rounded text-black transition-transform ${shake ? 'animate-shake' : ''} border-2 border-white`}
-                  placeholder="Type here..."
-                />
+                <div className="mb-4 text-xl">Enter the code to lift the darkness:</div>
+                <div className="flex justify-center gap-4 mb-4">
+                  {[...Array(3)].map((_, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength="1"
+                      value={userInput[index] || ''}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        if (newValue.length <= 1) {
+                          const newInput = userInput.split('');
+                          newInput[index] = newValue;
+                          setUserInput(newInput.join(''));
+                          
+                          // Auto-focus next input if available
+                          if (newValue && index < 2) {
+                            const nextInput = e.target.parentElement.nextElementSibling?.querySelector('input');
+                            if (nextInput) nextInput.focus();
+                          }
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        // Handle backspace to move to previous input
+                        if (e.key === 'Backspace' && !userInput[index] && index > 0) {
+                          const prevInput = e.target.parentElement.previousElementSibling?.querySelector('input');
+                          if (prevInput) prevInput.focus();
+                        }
+                      }}
+                      className={`w-16 h-16 text-center text-3xl bg-gray-800 rounded-md 
+                        border-2 ${shake ? 'animate-shake' : ''} 
+                        ${userInput[index] ? 'border-green-500' : 'border-white'} 
+                        text-white focus:outline-none focus:border-blue-500`}
+                    />
+                  ))}
+                </div>
                 <button
                   onClick={() => {
-                    // Get the wall1_code from game context
                     console.log('Light code:', lightCode);
-                    if(!userInput) {
+                    if (userInput.length < 3) {
                       setShake(true);
                       setTimeout(() => setShake(false), 500);
                       return;
                     }
-                    else if (userInput.toLowerCase().trim() === lightCode.toLowerCase()) {
+                    else if (userInput === lightCode) {
                       setIsDark(false);
                       setShowInputOverlay(false);
                     } else {
@@ -369,7 +395,7 @@ const Wall1 = () => {
                       setUserInput('');
                     }
                   }}
-                  className="mt-2 px-4 py-2 bg-green-600 rounded hover:bg-green-700"
+                  className="w-full px-4 py-2 bg-green-600 rounded hover:bg-green-700"
                 >
                   Submit
                 </button>
