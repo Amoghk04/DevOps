@@ -21,6 +21,7 @@ export function GameProvider({ children }) {
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
+  const onlineAudioRef = useRef(null); // New ref for online sound
 
   const saveGateOutputs = (gateNumber, outputs) => {
     setGateOutputStates(prev => ({
@@ -60,14 +61,22 @@ export function GameProvider({ children }) {
   };
 
   const playErrorSound = () => {
-  if (errorAudioRef.current) {
-    errorAudioRef.current.currentTime = 0; // Rewind to start
-    errorAudioRef.current.play().catch((e) => {
-      console.log("Error sound failed to play:", e);
-    });
-  }
-};
+    if (errorAudioRef.current) {
+      errorAudioRef.current.currentTime = 0; // Rewind to start
+      errorAudioRef.current.play().catch((e) => {
+        console.log("Error sound failed to play:", e);
+      });
+    }
+  };
 
+  const playOnlineSound = () => {
+    if (onlineAudioRef.current) {
+      onlineAudioRef.current.currentTime = 0; // Rewind to start
+      onlineAudioRef.current.play().catch((e) => {
+        console.log("Online sound failed to play:", e);
+      });
+    }
+  };
 
   useEffect(() => {
     const navType = performance.getEntriesByType("navigation")[0]?.type;
@@ -117,10 +126,12 @@ export function GameProvider({ children }) {
       isBgmPlaying,
       playBackgroundMusic,
       playErrorSound,
+      playOnlineSound,
     }}>
       {/* Audio element */}
       <audio ref={audioRef} src="/bgm.mp3" />
       <audio ref={errorAudioRef} src="/error.mp3" />
+      <audio ref={onlineAudioRef} src="/online.mp3" />
       {children}
     </GameContext.Provider>
   );

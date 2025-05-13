@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useGame } from '../../GameProvider';
 
 const WirePuzzle = ({ onComplete, onClose }) => {
   const COLORS = ['red', 'yellow', 'blue', 'green', 'purple', 'orange', 'teal', 'pink'];
@@ -9,6 +10,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
   const [gameComplete, setGameComplete] = useState(false);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
+  const { playOnlineSound } = useGame(); // Import playOnlineSound from GameProvider
 
   // Initialize the game
   useEffect(() => {
@@ -19,11 +21,12 @@ const WirePuzzle = ({ onComplete, onClose }) => {
   useEffect(() => {
     if (correctConnections.length === COLORS.length && !gameComplete) {
       setGameComplete(true);
+      playOnlineSound(); // Play the online sound when the game is complete
       setTimeout(() => {
         onComplete && onComplete();
       }, 1000);
     }
-  }, [correctConnections, gameComplete, onComplete]);
+  }, [correctConnections, gameComplete, onComplete, playOnlineSound]);
 
   const initializeGame = () => {
     // Shuffle both left and right side colors/positions
@@ -259,7 +262,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
       <g className="circuit-patterns" opacity="0.2">
         {/* Horizontal lines */}
         {[...Array(10)].map((_, i) => (
-          <path 
+          <path
             key={`h-line-${i}`}
             d={`M 0 ${30 + i * 40} H ${containerRef.current ? containerRef.current.clientWidth : 400}`}
             stroke="#0ff"
@@ -267,10 +270,10 @@ const WirePuzzle = ({ onComplete, onClose }) => {
             opacity="0.5"
           />
         ))}
-        
+
         {/* Vertical lines */}
         {[...Array(8)].map((_, i) => (
-          <path 
+          <path
             key={`v-line-${i}`}
             d={`M ${60 + i * 50} 0 V ${containerRef.current ? containerRef.current.clientHeight : 400}`}
             stroke="#0ff"
@@ -278,8 +281,8 @@ const WirePuzzle = ({ onComplete, onClose }) => {
             opacity="0.5"
           />
         ))}
-        
-        
+
+
       </g>
     );
   };
@@ -305,7 +308,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
             ))}
           </div>
         </div>
-        
+
         {/* Close button */}
         <button
           className="absolute top-2 right-2 text-gray-400 hover:text-red-500 z-10"
@@ -313,7 +316,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
         >
           ✕
         </button>
-        
+
         <div
           ref={containerRef}
           className="relative w-full h-full"
@@ -325,7 +328,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
           <svg className="w-full h-full" style={{ overflow: 'visible' }}>
             {/* Circuit patterns in background */}
             {renderCircuitPatterns()}
-            
+
             {/* Render wires */}
             {wires.map(renderWire)}
 

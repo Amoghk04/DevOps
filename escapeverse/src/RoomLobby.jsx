@@ -101,7 +101,7 @@ function RoomLobby() {
     if (isHost) {
       socketRef.current.emit("start-game", { roomId, theme });
     }
-    playBackgroundMusic(); // Play background music when starting the game
+    //playBackgroundMusic(); // Play background music when starting the game
   };
 
   const copyRoomCode = () => {
