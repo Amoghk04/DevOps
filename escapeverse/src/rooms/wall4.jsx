@@ -29,7 +29,7 @@ const Wall4 = () => {
                 console.log('passcode clicked!');
             }
         }
-        
+
         // Add more interactive areas specific to the left wall here
     ];
 
@@ -104,8 +104,8 @@ const Wall4 = () => {
                 {showTileGrid && (
                     <div className="absolute inset-0 flex items-center justify-center z-20">
                         <div className="bg-black bg-opacity-70 absolute inset-0" onClick={handleCloseTileGrid}></div>
-                        <div className="bg-white rounded-xl p-6 shadow-2xl relative z-30 max-w-2xl">
-                            <button 
+                        <div className="bg-grey-900 rounded-xl p-6 shadow-2xl relative z-30 max-w-2xl">
+                            <button
                                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                                 onClick={handleCloseTileGrid}
                             >

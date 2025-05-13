@@ -78,7 +78,7 @@ hasDecryptedFile, wall2Number;
         type: 'system',
         content: `The final key is: ${randomNumber}`
       };
-    } else if (command === 'openssl decrypt access_codes.dat') {
+    } else if (command === 'openssl enc -d access_codes.dat') {
       setHasDecryptedFile(true);
       const updatedFiles = files.map(file => 
         file.name === 'clue.txt' ? { ...file, hidden: false } : file
@@ -431,7 +431,7 @@ Location: CLASSIFIED`
             <h3 className="text-xl text-green-400 mb-4">Congratulations!</h3>
             <p className="text-white mb-4">You've won! Here's a helpful command:</p>
             <code className="bg-black p-2 rounded text-green-400 block mb-4">
-              openssl decrypt access_codes.dat
+              openssl enc -d
             </code>
             <button
               onClick={() => setShowTicTacToeWinMessage(false)}
