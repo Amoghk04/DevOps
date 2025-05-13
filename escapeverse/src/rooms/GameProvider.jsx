@@ -20,7 +20,7 @@ export function GameProvider({ children }) {
 
   const [lightCode, setLightCode] = useState('');
 
-  const [patternGen, setPatternGen] = useState({});
+  const [generatedPattern, setGeneratedPattern] = useState('');
 
   const saveGateOutputs = (gateNumber, outputs) => {
     setGateOutputStates(prev => ({
@@ -80,8 +80,8 @@ export function GameProvider({ children }) {
       setGateActiveState,
       lightCode,
       setLightCode,
-      patternGen,
-      setPatternGen
+      generatedPattern,
+      setGeneratedPattern,
     }}>
       {children}
     </GameContext.Provider>
