@@ -295,11 +295,12 @@ const Wall1 = () => {
         />
 
         {/* Use GateComponent to render gates */}
+        { isDark ? (
         <GateComponent
           gatePositions={wall1GatePositions}
           onGateClick={handleGateClick}
-        />
-
+        />) : null
+        }
         {/* Arrow Navigation Indicators */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
           <div

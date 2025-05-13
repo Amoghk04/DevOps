@@ -113,7 +113,7 @@ const getRandomGate = () => gates[Math.floor(Math.random() * gates.length)];
 
 export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }) {
     const canvasRef = useRef(null);
-    const [answer] = useState("");
+    const [answer, setAnswer] = useState("");
     const [circuit, setCircuit] = useState(null);
     const [userOutputs, setUserOutputs] = useState([]);
     const [successMessage, setSuccessMessage] = useState("");
@@ -362,7 +362,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
     }, [userOutputs, circuit, gateActiveStates, gateNumber]);
 
     // Function to generate wall1_code from all gate outputs
-    /*const generateWallCode = () => {
+    const generateWallCode = () => {
         // Get all the active gate numbers (sorted to ensure consistent order)
         const activeGateNumbers = Object.keys(gateActiveStates || {})
             .filter(gate => gateActiveStates[gate])
@@ -384,7 +384,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         });
 
         return code;
-    };*/
+    };
 
     const checkAnswer = () => {
         if (circuit && !gateActiveStates?.[gateNumber]) {
@@ -427,10 +427,17 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         return finalCode;
     };
 
+    /*const revealAnswer = () => {
+        if (circuit && !gateActiveStates?.[gateNumber]) {
+            setAnswer("Correct Output: " + circuit.outputs.join(" "));
+        }
+    };
+    */
     return (
         <div style={{ background: "#0a0a0a", color: "#0ff", fontFamily: "monospace", textAlign: "center" }}>
             <canvas ref={canvasRef} width="1200" height="500" style={canvasStyle}></canvas>
             <br />
+            
             {/*<button
                 onClick={revealAnswer}
                 style={{
