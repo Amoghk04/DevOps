@@ -113,7 +113,7 @@ const getRandomGate = () => gates[Math.floor(Math.random() * gates.length)];
 
 export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }) {
     const canvasRef = useRef(null);
-    const [answer, setAnswer] = useState("");
+    const [answer] = useState("");
     const [circuit, setCircuit] = useState(null);
     const [userOutputs, setUserOutputs] = useState([]);
     const [successMessage, setSuccessMessage] = useState("");
@@ -124,10 +124,9 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         gateOutputStates,
         saveGateOutputs,
         setLightCode,
-        lightCode
     } = useGame();
     const outputPositionsRef = useRef([]);
-
+    
     // Check if all gates are solved
     const allGatesSolved = React.useMemo(() => {
         if (!gateActiveStates) return false;
@@ -362,14 +361,8 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         }
     }, [userOutputs, circuit, gateActiveStates, gateNumber]);
 
-    /*const revealAnswer = () => {
-        if (circuit && !gateActiveStates?.[gateNumber]) {
-            setAnswer("Correct Output: " + circuit.outputs.join(" "));
-        }
-    };*/
-
     // Function to generate wall1_code from all gate outputs
-    const generateWallCode = () => {
+    /*const generateWallCode = () => {
         // Get all the active gate numbers (sorted to ensure consistent order)
         const activeGateNumbers = Object.keys(gateActiveStates || {})
             .filter(gate => gateActiveStates[gate])
@@ -391,7 +384,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         });
 
         return code;
-    };
+    };*/
 
     const checkAnswer = () => {
         if (circuit && !gateActiveStates?.[gateNumber]) {
@@ -404,12 +397,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
                 // Make sure to save the correct outputs
                 saveGateOutputs(gateNumber, userOutputs);
 
-                // Generate and update the wall code
-                setTimeout(() => {
-                    // We use setTimeout to ensure state updates have propagated
-                    const newWallCode = generateWallCode();
-                    setWall1Code(newWallCode);
-                }, 0);
+                
             }
         }
     };
