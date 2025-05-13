@@ -48,8 +48,6 @@ const Wall1 = () => {
         console.log('Lever clicked!');
         setShowInputOverlay(true);
         setUserInput('');
-
-        // Reset the lever activation after message disappears
         setTimeout(() => {
           setShowLeverMessage(false);
         }, 10000);
@@ -295,11 +293,11 @@ const Wall1 = () => {
         />
 
         {/* Use GateComponent to render gates */}
-        { isDark ? (
-        <GateComponent
-          gatePositions={wall1GatePositions}
-          onGateClick={handleGateClick}
-        />) : null
+        {isDark ? (
+          <GateComponent
+            gatePositions={wall1GatePositions}
+            onGateClick={handleGateClick}
+          />) : null
         }
         {/* Arrow Navigation Indicators */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
@@ -356,7 +354,7 @@ const Wall1 = () => {
                           const newInput = userInput.split('');
                           newInput[index] = newValue;
                           setUserInput(newInput.join(''));
-                          
+
                           // Auto-focus next input if available
                           if (newValue && index < 2) {
                             const nextInput = e.target.parentElement.nextElementSibling?.querySelector('input');

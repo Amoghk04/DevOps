@@ -2,6 +2,7 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { UserContext } from "./UserContext"; // Import your UserContext
+import { useGame } from "./rooms/GameProvider";
 
 function RoomLobby() {
   const { roomId } = useParams();
@@ -15,16 +16,17 @@ function RoomLobby() {
   const navigate = useNavigate();
   const socketRef = useRef(null);
   const joinedRef = useRef(false);
+  const { playBackgroundMusic } = useGame(); // Access the playBackgroundMusic function from GameProvider
 
   useEffect(() => {
     console.log("Room Lobby rendered. Path:", window.location.pathname);
     console.log("Search params:", Object.fromEntries([...searchParams]));
     console.log("Local storage host:", localStorage.getItem("isRoomHost"));
     console.log("Local storage room ID:", localStorage.getItem("roomHostId"));
-    
+
     // Create socket connection inside the component
     socketRef.current = io("http://localhost:3001");
-    
+
     // Set up event listeners first before joining
     socketRef.current.on("room-players", (data) => {
       console.log("Updated player list:", data);
@@ -34,7 +36,7 @@ function RoomLobby() {
       } else if (data && data.players) {
         setPlayers(data.players);
         setHostId(data.hostId);
-        
+
         // Check if current user is the host
         if (data.hostId === socketRef.current.id) {
           setIsHost(true);
@@ -56,27 +58,27 @@ function RoomLobby() {
     // Join the room if we have user info and haven't joined yet
     if (user && !joinedRef.current) {
       console.log("Joining room as:", user.displayName);
-      
+
       // Check if user is creator - either from URL or localStorage
-      const isCreator = searchParams.has("creator") || 
-                        (localStorage.getItem("isRoomHost") === "true" &&
-                        localStorage.getItem("roomHostId") === roomId);
-      
+      const isCreator = searchParams.has("creator") ||
+        (localStorage.getItem("isRoomHost") === "true" &&
+          localStorage.getItem("roomHostId") === roomId);
+
       console.log("Is creator?", isCreator);
-      
-      socketRef.current.emit("join-room", { 
-        roomId, 
+
+      socketRef.current.emit("join-room", {
+        roomId,
         username: user.displayName,
         isCreator: isCreator
       });
-      
+
       joinedRef.current = true;
-      
+
       // If we are the creator, we know we're the host
       if (isCreator) {
         setIsHost(true);
       }
-      
+
       // Clear localStorage if we're not the host of this particular room
       if (localStorage.getItem("roomHostId") !== roomId) {
         localStorage.removeItem("isRoomHost");
@@ -99,6 +101,7 @@ function RoomLobby() {
     if (isHost) {
       socketRef.current.emit("start-game", { roomId, theme });
     }
+    playBackgroundMusic(); // Play background music when starting the game
   };
 
   const copyRoomCode = () => {
@@ -113,7 +116,7 @@ function RoomLobby() {
     <div className="min-h-screen flex flex-col items-center justify-center text-white p-10 bg-black/70">
       <h1 className="text-3xl font-bold mb-4">Room: {roomId}</h1>
       <h2 className="text-xl mb-2">Theme: {theme}</h2>
-      
+
       {/* Display room code for sharing */}
       <div className="mb-6 text-center">
         <h3 className="text-xl font-semibold">Room Code:</h3>
@@ -126,7 +129,7 @@ function RoomLobby() {
           Copy Room Code
         </button>
       </div>
-      
+
       {/* Display the players list */}
       <div className="mb-6">
         <h3 className="text-xl font-semibold">Players in the Room:</h3>
@@ -134,8 +137,8 @@ function RoomLobby() {
           {players && players.length > 0 ? (
             players.map((p, idx) => (
               <li key={idx} className="text-lg">
-                {p.username || "Anonymous Player"} 
-                {p.id === socketRef.current?.id ? " (You)" : ""} 
+                {p.username || "Anonymous Player"}
+                {p.id === socketRef.current?.id ? " (You)" : ""}
                 {p.id === hostId ? " (Host)" : ""}
               </li>
             ))
