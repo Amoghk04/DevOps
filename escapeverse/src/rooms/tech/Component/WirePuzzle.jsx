@@ -10,7 +10,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
   const [gameComplete, setGameComplete] = useState(false);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
-  const { playOnlineSound } = useGame(); // Import playOnlineSound from GameProvider
+  const { playOnlineSound, playWireSound, stopWireSound } = useGame(); // Import playOnlineSound from GameProvider
 
   // Initialize the game
   useEffect(() => {
@@ -26,7 +26,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
         onComplete && onComplete();
       }, 1000);
     }
-  }, [correctConnections, gameComplete, onComplete, playOnlineSound]);
+  }, [correctConnections, gameComplete, onComplete, playOnlineSound, playWireSound]);
 
   const initializeGame = () => {
     // Shuffle both left and right side colors/positions
@@ -77,8 +77,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
 
   const handleWireMouseDown = (wire) => {
     if (correctConnections.includes(wire.id)) return;
-
-    // Remove existing connection when clicking on wire
+    playWireSound(); // Play wire sound when wire is clicked
     setConnections(prev => {
       const newConnections = { ...prev };
       delete newConnections[wire.id];
@@ -101,6 +100,7 @@ const WirePuzzle = ({ onComplete, onClose }) => {
   };
 
   const handleMouseUp = (e) => {
+    stopWireSound(); // Stop wire sound when mouse is released
     if (!selectedWire) return;
 
     // Check if mouse is over any right endpoint

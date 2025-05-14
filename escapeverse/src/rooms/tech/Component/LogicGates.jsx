@@ -126,6 +126,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         setLightCode,
     } = useGame();
     const outputPositionsRef = useRef([]);
+    const { playGateSolveSound } = useGame();
     
     // Check if all gates are solved
     const allGatesSolved = React.useMemo(() => {
@@ -392,6 +393,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
             setSuccessMessage(isCorrect ? "Gate is connected and fixed!" : "Not quite right, try again!");
 
             if (isCorrect) {
+                playGateSolveSound();
                 // Set this specific gate as active
                 setGateActiveState(gateNumber, true);
                 // Make sure to save the correct outputs

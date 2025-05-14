@@ -22,6 +22,8 @@ export function GameProvider({ children }) {
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
   const onlineAudioRef = useRef(null); // New ref for online sound
+  const wireAudioRef = useRef(null); // New ref for wire sound
+  const gateSolveAudioRef = useRef(null); // New ref for gate solve sound
 
   const saveGateOutputs = (gateNumber, outputs) => {
     setGateOutputStates(prev => ({
@@ -60,11 +62,11 @@ export function GameProvider({ children }) {
     }
   };
 
-  const playErrorSound = () => {
-    if (errorAudioRef.current) {
-      errorAudioRef.current.currentTime = 0; // Rewind to start
-      errorAudioRef.current.play().catch((e) => {
-        console.log("Error sound failed to play:", e);
+  const playGateSolveSound = () => {
+    if (gateSolveAudioRef.current) {
+      gateSolveAudioRef.current.currentTime = 0; // Rewind to start
+      gateSolveAudioRef.current.play().catch((e) => {
+        console.log("GateSolve sound failed to play:", e);
       });
     }
   };
@@ -74,6 +76,31 @@ export function GameProvider({ children }) {
       onlineAudioRef.current.currentTime = 0; // Rewind to start
       onlineAudioRef.current.play().catch((e) => {
         console.log("Online sound failed to play:", e);
+      });
+    }
+  };
+
+  const playWireSound = () => {
+    if (wireAudioRef.current) {
+      wireAudioRef.current.loop = true; // Loop the music
+      wireAudioRef.current.play().catch((e) => {
+        console.log("Wire sound failed to play:", e);
+      });
+    }
+  };
+
+  const stopWireSound = () => {
+    if (wireAudioRef.current) {
+      wireAudioRef.current.pause(); 
+      wireAudioRef.current.currentTime = 0; 
+    }
+  };
+
+  const playErrorSound = () => {
+    if (errorAudioRef.current) {
+      errorAudioRef.current.currentTime = 0; // Rewind to start
+      errorAudioRef.current.play().catch((e) => {
+        console.log("Error sound failed to play:", e);
       });
     }
   };
@@ -127,11 +154,16 @@ export function GameProvider({ children }) {
       playBackgroundMusic,
       playErrorSound,
       playOnlineSound,
+      playWireSound,
+      stopWireSound,
+      playGateSolveSound
     }}>
       {/* Audio element */}
       <audio ref={audioRef} src="/bgm.mp3" />
       <audio ref={errorAudioRef} src="/error.mp3" />
       <audio ref={onlineAudioRef} src="/online.mp3" />
+      <audio ref={wireAudioRef} src="/wire.mp3" />
+      <audio ref={gateSolveAudioRef} src="/gateSolve.mp3" />
       {children}
     </GameContext.Provider>
   );
