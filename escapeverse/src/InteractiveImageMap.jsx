@@ -6,14 +6,31 @@ const InteractiveImageMap = ({
   fullscreenOnMount = false,
   showDebug = false,
   className = "w-screen h-screen relative overflow-hidden",
+  containerClassName = "w-screen h-screen fixed top-0 left-0",
   hoverBorderColor = "rgba(255, 204, 0, 0.8)",
-  hoverBorderWidth = "3px"
+  hoverBorderWidth = "3px",
+  aspectRatio = null // Optional explicit aspect ratio (e.g. "16/9")
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hoveringAreaId, setHoveringAreaId] = useState(null);
+  const [imageNaturalDimensions, setImageNaturalDimensions] = useState({ width: 0, height: 0 });
+  const [imgLoaded, setImgLoaded] = useState(false);
   const imageRef = useRef(null);
   const containerRef = useRef(null);
   const [scaledAreas, setScaledAreas] = useState([]);
+
+  // Calculate image's natural aspect ratio once loaded
+  useEffect(() => {
+    const loadImage = new Image();
+    loadImage.onload = () => {
+      setImageNaturalDimensions({
+        width: loadImage.naturalWidth,
+        height: loadImage.naturalHeight
+      });
+      setImgLoaded(true);
+    };
+    loadImage.src = imageSrc;
+  }, [imageSrc]);
 
   useEffect(() => {
     // Function to request fullscreen
@@ -52,23 +69,41 @@ const InteractiveImageMap = ({
   // Calculate areas positions when image loads or resizes
   useEffect(() => {
     const calculateAreas = () => {
-      if (imageRef.current && areas.length > 0) {
+      if (imageRef.current && areas.length > 0 && imgLoaded) {
         // Get the natural dimensions of the image
-        const naturalWidth = imageRef.current.naturalWidth;
-        const naturalHeight = imageRef.current.naturalHeight;
+        const naturalWidth = imageNaturalDimensions.width;
+        const naturalHeight = imageNaturalDimensions.height;
         
-        // Get the displayed dimensions of the image
-        const displayedWidth = imageRef.current.offsetWidth;
-        const displayedHeight = imageRef.current.offsetHeight;
+        // Get the container dimensions (viewport size)
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
         
-        // Calculate the scale factors
+        // Calculate the dimensions of the image as displayed with object-cover
+        let displayedWidth, displayedHeight;
+        
+        // Calculate what the image dimensions would be if scaled to fill the container
+        // while maintaining aspect ratio
+        const containerRatio = containerWidth / containerHeight;
+        const imageRatio = naturalWidth / naturalHeight;
+        
+        if (containerRatio > imageRatio) {
+          // Container is wider than the image aspect ratio - image will be stretched horizontally
+          displayedWidth = containerWidth;
+          displayedHeight = containerWidth / imageRatio;
+        } else {
+          // Container is taller than the image aspect ratio - image will be stretched vertically
+          displayedHeight = containerHeight;
+          displayedWidth = containerHeight * imageRatio;
+        }
+        
+        // Calculate offsets to center the image
+        const offsetLeft = (containerWidth - displayedWidth) / 2;
+        const offsetTop = (containerHeight - displayedHeight) / 2;
+        
+        // Calculate scaling factors
         const scaleX = displayedWidth / naturalWidth;
         const scaleY = displayedHeight / naturalHeight;
         
-        // Apply offset corrections
-        const offsetLeft = imageRef.current.offsetLeft;
-        const offsetTop = imageRef.current.offsetTop;
-
         // Calculate scaled areas
         const newScaledAreas = areas.map(area => {
           const coords = area.coords.split(',').map(Number);
@@ -91,13 +126,14 @@ const InteractiveImageMap = ({
           const scaledHeight = (maxY - minY) * scaleY;
           
           // Create points array for polygon detection
-          const points = coords.map((coord, i) => {
-            if (i % 2 === 0) { // x coordinate
-              return coord * scaleX + offsetLeft;
-            } else { // y coordinate
-              return coord * scaleY + offsetTop;
+          const points = [];
+          for (let i = 0; i < coords.length; i += 2) {
+            if (i + 1 < coords.length) {
+              const x = coords[i] * scaleX + offsetLeft;
+              const y = coords[i+1] * scaleY + offsetTop;
+              points.push(x, y);
             }
-          });
+          }
           
           // Create polygon points string for SVG
           const svgPoints = [];
@@ -117,7 +153,7 @@ const InteractiveImageMap = ({
               width: scaledWidth,
               height: scaledHeight
             },
-            points: points,
+            points,
             svgPoints: svgPoints.join(' ')
           };
         });
@@ -127,9 +163,7 @@ const InteractiveImageMap = ({
     };
 
     // Calculate initially and on window resize
-    if (imageRef.current) {
-      imageRef.current.onload = calculateAreas;
-      
+    if (imgLoaded) {
       // Also calculate on window resize
       window.addEventListener('resize', calculateAreas);
       
@@ -140,18 +174,17 @@ const InteractiveImageMap = ({
     return () => {
       window.removeEventListener('resize', calculateAreas);
     };
-  }, [areas, imageSrc]);
+  }, [areas, imgLoaded, imageNaturalDimensions]);
 
   // Check if a point is inside a polygon
   const isPointInPolygon = (x, y, polygon) => {
-    if (!polygon) return false;
+    if (!polygon || polygon.length < 6) return false; // Need at least 3 points (6 values)
     
     let inside = false;
-    const points = polygon;
     
-    for (let i = 0, j = points.length - 2; i < points.length; j = i, i += 2) {
-      const xi = points[i], yi = points[i + 1];
-      const xj = points[j], yj = points[j + 1];
+    for (let i = 0, j = polygon.length - 2; i < polygon.length; j = i, i += 2) {
+      const xi = polygon[i], yi = polygon[i + 1];
+      const xj = polygon[j], yj = polygon[j + 1];
       
       const intersect = ((yi > y) !== (yj > y)) && 
                         (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
@@ -163,7 +196,7 @@ const InteractiveImageMap = ({
 
   // Handle mouse movement over the container
   const handleMouseMove = (e) => {
-    if (scaledAreas.length === 0) return;
+    if (scaledAreas.length === 0 || !containerRef.current) return;
 
     // Get mouse position relative to the container
     const rect = containerRef.current.getBoundingClientRect();
@@ -194,10 +227,15 @@ const InteractiveImageMap = ({
     }
   };
   
+  // Determine aspect ratio style
+  const getAspectRatioStyle = () => {
+    return {}; // No explicit aspect ratio - we'll handle it with object-cover
+  };
+  
   return (
     <div 
+      className={containerClassName}
       ref={containerRef}
-      className={className}
       onMouseMove={handleMouseMove}
       onClick={(e) => {
         if (!hoveringAreaId) return;
@@ -216,37 +254,51 @@ const InteractiveImageMap = ({
         }
       }}
     >
-      {/* Main background image */}
-      <img 
-        ref={imageRef}
-        src={imageSrc} 
-        className="w-full h-full object-cover"
-        alt="Interactive map"
-        style={{ pointerEvents: 'none' }} // Disable image map behavior
-      />
-      
-      {/* SVG overlay for hover effects */}
-      <svg 
-        className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
-        style={{ overflow: 'visible' }}
+      {/* Main background image with aspect ratio container */}
+      <div 
+        className={className}
+        style={getAspectRatioStyle()}
       >
-        {scaledAreas.map(area => {
-          const isHovering = area.id === hoveringAreaId;
-          return (
-            <polygon 
-              key={area.id}
-              points={area.svgPoints}
-              fill="transparent"
-              stroke={isHovering ? hoverBorderColor : 'transparent'}
-              strokeWidth={hoverBorderWidth}
-              strokeLinejoin="round"
-              style={{
-                transition: 'stroke 0.2s ease'
-              }}
-            />
-          );
-        })}
-      </svg>
+        <img 
+          ref={imageRef}
+          src={imageSrc} 
+          className="w-full h-full object-cover"
+          alt="Interactive map"
+          style={{ pointerEvents: 'none' }} // Disable image map behavior
+          onLoad={() => {
+            if (imageRef.current) {
+              setImageNaturalDimensions({
+                width: imageRef.current.naturalWidth,
+                height: imageRef.current.naturalHeight
+              });
+              setImgLoaded(true);
+            }
+          }}
+        />
+        
+        {/* SVG overlay for hover effects */}
+        <svg 
+          className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
+          style={{ overflow: 'visible' }}
+        >
+          {scaledAreas.map(area => {
+            const isHovering = area.id === hoveringAreaId;
+            return (
+              <polygon 
+                key={area.id}
+                points={area.svgPoints}
+                fill="transparent"
+                stroke={isHovering ? hoverBorderColor : 'transparent'}
+                strokeWidth={hoverBorderWidth}
+                strokeLinejoin="round"
+                style={{
+                  transition: 'stroke 0.2s ease'
+                }}
+              />
+            );
+          })}
+        </svg>
+      </div>
       
       {/* Status indicator for debugging */}
       {showDebug && (
@@ -256,6 +308,10 @@ const InteractiveImageMap = ({
           {hoveringAreaId ? `Hovering: ${hoveringAreaId}` : 'Not hovering'}
           <br />
           Areas: {scaledAreas.length}
+          <br />
+          Image: {imageNaturalDimensions.width} x {imageNaturalDimensions.height}
+          <br />
+          Aspect Ratio: {imageNaturalDimensions.width / imageNaturalDimensions.height}
         </div>
       )}
     </div>

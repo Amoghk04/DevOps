@@ -440,7 +440,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
             <canvas ref={canvasRef} width="1200" height="500" style={canvasStyle}></canvas>
             <br />
             
-            {/*<button
+            {<button
                 onClick={revealAnswer}
                 style={{
                     ...buttonStyle,
@@ -451,7 +451,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
             >
                 Reveal Answer
             </button>
-            */}
+            }
             <button
                 onClick={checkAnswer}
                 style={{

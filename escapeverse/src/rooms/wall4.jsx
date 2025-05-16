@@ -36,16 +36,15 @@ const Wall4 = () => {
     const areas1 = [
         {
             id: 'closed-window',
-            coords: "484,47,984,47,982,784,481,784",
+            coords: "484,121,984,121,982,754,481,754",
             onClick: () => {
             },
         },
         {
             id: 'passcode',
-            coords: "1021,264,1066,264,1067,327,1021,327",
+            coords: "1021,305,1066,305,1067,357,1021,357",
             onClick: () => {
                 setIsWindowClosed(false); // Set the window state to open
-                setCurrentImage("/wall4.png"); // Change the image when clicked
             }
         }
     ]
