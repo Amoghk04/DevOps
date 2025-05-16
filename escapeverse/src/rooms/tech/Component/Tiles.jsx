@@ -242,14 +242,6 @@ export default function TileGrid() {
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-900 rounded-lg">
-      <div className="mb-6 text-gray-200 font-mono text-xl">
-        Number Sequence Puzzle
-      </div>
-
-      <div className="mb-4 text-gray-300 font-mono text-sm">
-        Score: {score}/{totalPossible}
-      </div>
-
       {tiles.map((row, rowIndex) => (
         <div key={`row-${rowIndex}`} className="mb-6 w-full">
           <div className="flex items-center mb-2">
@@ -270,7 +262,6 @@ export default function TileGrid() {
               </button>
             )}
           </div>
-
           <div className="grid grid-cols-6 gap-3">
             {row.map((number, colIndex) => {
               const isHidden = hiddenTiles[rowIndex]?.includes(colIndex);
@@ -345,17 +336,6 @@ export default function TileGrid() {
       ))}
 
       <div className="flex gap-4">
-        <button
-          onClick={regeneratePatterns}
-          className="px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 transition-colors mt-4 text-sm font-mono shadow-lg"
-          style={{
-            fontFamily: "'Courier Prime', monospace",
-            boxShadow: '0 4px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)'
-          }}
-        >
-          New Patterns
-        </button>
-
         <button
           onClick={() => {
             // Reveal all answers by filling in correct values

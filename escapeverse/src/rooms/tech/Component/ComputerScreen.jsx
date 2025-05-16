@@ -427,7 +427,7 @@ Location: CLASSIFIED`
                         setStartMenuOpen(false);
                       }}
                     >
-                      <Power size={18} className="text-red-400 mr-3" />
+                      <Power size={18} onClick={handleSound} className="text-red-400 mr-3" />
                       <span onClick={handleSound} className="text-white text-sm">Shutdown</span>
                     </div>
                   </div>

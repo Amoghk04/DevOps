@@ -54,6 +54,31 @@ const Wall2 = () => {
                     displayMessage('The power is already restored.');
                 }
             }
+        },
+        {
+            id: 'cpu',
+            coords: "850,338,944,338,944,513,852,515",
+            onClick: () => {
+                if (!isPowerOn) {
+                    displayMessage('ERROR: Need power to access the CPU!');
+                } else {
+                    displayMessage('The CPU is powered on.');
+                }
+            }
+        },
+        {
+            id: 'pot',
+            coords: "761,467,793,470,826,467,819,514,796,515,768,513",
+            onClick: () => {
+                displayMessage('Is there something beneath the pot?');
+            }
+        },
+        {
+            id: 'bookshelf',
+            coords: "87,135,191,131,270,176,266,529,188,552,85,552",
+            onClick: () => {
+                displayMessage('Quite a collection of books. Nothing special.');
+            }
         }
     ];
 
