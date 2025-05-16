@@ -32,7 +32,7 @@ PS: take me back to where my home is, I shall give you the passkey.`, hidden: tr
   ]);
   const [openFile, setOpenFile] = useState(null);
   const [time, setTime] = useState(new Date());
-  const { setServerRoomKey } = useGame();
+  const { setServerRoomKey, playWindowsOnSound, playWindowsOffSound } = useGame();
 
 hasDecryptedFile, wall2Number;
 
@@ -58,10 +58,13 @@ hasDecryptedFile, wall2Number;
       setStartMenuOpen(false);
       setTimeout(() => {
         setIsOn(false);
-      }, 500);
+      }, 1000);
     } else {
       // Boot sequence
-      setIsOn(true);
+      setTimeout(() => {
+        setIsOn(true);
+      }, 2000);
+      //setIsOn(true);
     }
   };
 
@@ -148,6 +151,14 @@ Location: CLASSIFIED`
     setShowTicTacToeWinMessage(true);
   };
 
+  const handleSound = () => {
+    if (!isOn) {
+      playWindowsOnSound();
+    } else {
+      playWindowsOffSound();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -161,7 +172,7 @@ Location: CLASSIFIED`
           onClick={handlePowerToggle}
           className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full z-20 hover:bg-gray-700"
         >
-          <Power size={16} className={`${isOn ? 'text-green-400' : 'text-red-400'}`} />
+          <Power size={16} onClick={handleSound} className={`${isOn ? 'text-green-400' : 'text-red-400'}`} />
         </button>
 
         {/* Close button */}
@@ -417,7 +428,7 @@ Location: CLASSIFIED`
                       }}
                     >
                       <Power size={18} className="text-red-400 mr-3" />
-                      <span className="text-white text-sm">Shutdown</span>
+                      <span onClick={handleSound} className="text-white text-sm">Shutdown</span>
                     </div>
                   </div>
                 </div>

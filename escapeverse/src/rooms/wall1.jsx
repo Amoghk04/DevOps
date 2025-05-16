@@ -9,7 +9,7 @@ const Wall1 = () => {
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
-  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions, lightCode } = useGame();
+  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions, lightCode, playLightOnSound } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -385,6 +385,7 @@ const Wall1 = () => {
                       return;
                     }
                     else if (userInput === lightCode) {
+                      playLightOnSound();
                       setIsDark(false);
                       setShowInputOverlay(false);
                     } else {

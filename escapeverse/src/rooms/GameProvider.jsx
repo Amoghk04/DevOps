@@ -24,6 +24,9 @@ export function GameProvider({ children }) {
   const onlineAudioRef = useRef(null); // New ref for online sound
   const wireAudioRef = useRef(null); // New ref for wire sound
   const gateSolveAudioRef = useRef(null); // New ref for gate solve sound
+  const lightOnAudioRef = useRef(null); // New ref for light on sound
+  const windowsOnAudioRef = useRef(null); // New ref for windows on sound
+  const windowsOffAudioRef = useRef(null); // New ref for windows off sound
 
   const saveGateOutputs = (gateNumber, outputs) => {
     setGateOutputStates(prev => ({
@@ -105,6 +108,33 @@ export function GameProvider({ children }) {
     }
   };
 
+  const playLightOnSound = () => {
+    if (lightOnAudioRef.current) {
+      lightOnAudioRef.current.currentTime = 0; // Rewind to start
+      lightOnAudioRef.current.play().catch((e) => {
+        console.log("LightOn sound failed to play:", e);
+      });
+    }
+  };
+
+  const playWindowsOffSound = () => {
+    if (windowsOffAudioRef.current) {
+      windowsOffAudioRef.current.currentTime = 0; // Rewind to start
+      windowsOffAudioRef.current.play().catch((e) => {
+        console.log("WindowsOff sound failed to play:", e);
+      });
+    }
+  };
+
+  const playWindowsOnSound = () => {
+    if (windowsOnAudioRef.current) {
+      windowsOnAudioRef.current.currentTime = 0; // Rewind to start
+      windowsOnAudioRef.current.play().catch((e) => {
+        console.log("WindowsOn sound failed to play:", e);
+      });
+    }
+  };
+
   useEffect(() => {
     const navType = performance.getEntriesByType("navigation")[0]?.type;
     if (navType === "reload") {
@@ -156,7 +186,10 @@ export function GameProvider({ children }) {
       playOnlineSound,
       playWireSound,
       stopWireSound,
-      playGateSolveSound
+      playGateSolveSound,
+      playLightOnSound,
+      playWindowsOnSound,
+      playWindowsOffSound,
     }}>
       {/* Audio element */}
       <audio ref={audioRef} src="/bgm.mp3" />
@@ -164,6 +197,9 @@ export function GameProvider({ children }) {
       <audio ref={onlineAudioRef} src="/online.mp3" />
       <audio ref={wireAudioRef} src="/wire.mp3" />
       <audio ref={gateSolveAudioRef} src="/gateSolve.mp3" />
+      <audio ref={lightOnAudioRef} src="/lightOn.mp3" />
+      <audio ref={windowsOnAudioRef} src="/windowsOn.mp3" />
+      <audio ref={windowsOffAudioRef} src="/windowsOff.mp3" />
       {children}
     </GameContext.Provider>
   );
