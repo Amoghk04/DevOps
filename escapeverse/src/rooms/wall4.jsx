@@ -7,7 +7,7 @@ import TileGrid from './tech/Component/Tiles';
 const Wall4 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const { isDark } = useGame();
+    const { isDark, isWindowClosed, setIsWindowClosed } = useGame();
     const [currentImage, setCurrentImage] = useState("/wall4-closed.png");
     const [showTileGrid, setShowTileGrid] = useState(false); // State to control tile grid visibility
 
@@ -44,6 +44,7 @@ const Wall4 = () => {
             id: 'passcode',
             coords: "1021,264,1066,264,1067,327,1021,327",
             onClick: () => {
+                setIsWindowClosed(false); // Set the window state to open
                 setCurrentImage("/wall4.png"); // Change the image when clicked
             }
         }
@@ -70,8 +71,8 @@ const Wall4 = () => {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
             <div className="relative w-full h-full">
                 <InteractiveImageMap
-                    imageSrc={currentImage}
-                    areas={currentImage === "/wall4.png" ? areas : areas1}
+                    imageSrc={!isWindowClosed ? "/wall4.png" : "/wall4-closed.png"}
+                    areas={!isWindowClosed ? areas : areas1}
                     fullscreenOnMount={true}
                     showDebug={true}
                     className="w-full h-full object-cover"

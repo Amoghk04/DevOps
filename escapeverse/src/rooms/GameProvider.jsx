@@ -19,6 +19,7 @@ export function GameProvider({ children }) {
   const [serverRoomKey, setServerRoomKey] = useState('');
   const [isBgmPlaying, setIsBgmPlaying] = useState(false);
   const [hiddenTiles, setHiddenTiles] = useState([]);
+  const [isWindowClosed, setIsWindowClosed] = useState(true);
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
@@ -183,6 +184,8 @@ export function GameProvider({ children }) {
       setServerRoomKey,
       hiddenTiles,
       setHiddenTiles,
+      isWindowClosed,
+      setIsWindowClosed,
       isBgmPlaying,
       playBackgroundMusic,
       playErrorSound,
