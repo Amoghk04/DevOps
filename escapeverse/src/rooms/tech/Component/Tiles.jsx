@@ -7,7 +7,7 @@ export default function TileGrid() {
   const [revealedPatterns, setRevealedPatterns] = useState({});
   const [userGuesses, setUserGuesses] = useState({});
   const [correctGuesses, setCorrectGuesses] = useState({});
-  const {generatedPattern, setGeneratedPattern} = useGame(null);
+  const {generatedPattern, setGeneratedPattern, hiddenTiles, setHiddenTiles} = useGame();
 
 
   // Generate logical sequence patterns for each row
@@ -160,7 +160,7 @@ export default function TileGrid() {
   };
 
   // Hidden tiles information (which tiles are hidden in each row)
-  const [hiddenTiles, setHiddenTiles] = useState([]);
+  //const [hiddenTiles, setHiddenTiles] = useState([]);
 
   // Initialize tiles with logical sequence patterns
   const [tiles, setTiles] = useState([]);
@@ -186,15 +186,12 @@ export default function TileGrid() {
       return [pos];
     });
 
-    setHiddenTiles(hidden);
+    if(hiddenTiles.length === 0) {
+      setHiddenTiles(hidden);
+    }
     setUserGuesses({});
     setCorrectGuesses({});
   }, [generatedPattern]);
-
-  const regeneratePatterns = () => {
-    const newPattern = generateSequencePatterns();
-    setGeneratedPattern(newPattern);
-  };
 
   // Reveal a pattern description
   const revealPattern = (rowIndex) => {
@@ -233,10 +230,6 @@ export default function TileGrid() {
   const getRandomRotation = () => {
     return Math.random() * 2 - 1; // Between -1 and 1 degrees
   };
-
-  // Calculate score
-  const score = Object.keys(correctGuesses).length;
-  const totalPossible = hiddenTiles.flat().length;
 
   if (tiles.length === 0) return <div>Loading...</div>;
 

@@ -18,6 +18,7 @@ export function GameProvider({ children }) {
   const [generatedPattern, setGeneratedPattern] = useState('');
   const [serverRoomKey, setServerRoomKey] = useState('');
   const [isBgmPlaying, setIsBgmPlaying] = useState(false);
+  const [hiddenTiles, setHiddenTiles] = useState([]);
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
@@ -180,6 +181,8 @@ export function GameProvider({ children }) {
       setGeneratedPattern,
       serverRoomKey,
       setServerRoomKey,
+      hiddenTiles,
+      setHiddenTiles,
       isBgmPlaying,
       playBackgroundMusic,
       playErrorSound,
