@@ -20,6 +20,8 @@ export function GameProvider({ children }) {
   const [isBgmPlaying, setIsBgmPlaying] = useState(false);
   const [hiddenTiles, setHiddenTiles] = useState([]);
   const [isWindowClosed, setIsWindowClosed] = useState(true);
+  const [cornerLights, setCornerLights] = useState([false, false, false, false]);
+  const [gatesSolved, setGatesSolved] = useState([false, false, false, false]);
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
@@ -137,6 +139,21 @@ export function GameProvider({ children }) {
     }
   };
 
+  const updateCornerLight = (index) => {
+    setCornerLights(prev => {
+      const newLights = [...prev];
+      newLights[index] = true;
+      return newLights;
+    });
+  };
+
+  // Reset corner lights when room light is turned on
+  useEffect(() => {
+    if (!isDark) {
+      setCornerLights([false, false, false, false]);
+    } 
+  }, [isDark]);
+
   useEffect(() => {
     const navType = performance.getEntriesByType("navigation")[0]?.type;
     if (navType === "reload") {
@@ -153,6 +170,16 @@ export function GameProvider({ children }) {
       });
     }
   }, []);
+
+  const updateGateSolved = (gateIndex) => {
+    setGatesSolved(prev => {
+      const newSolved = [...prev];
+      newSolved[gateIndex] = true;
+      // Update corner light when gate is solved
+      updateCornerLight(gateIndex);
+      return newSolved;
+    });
+  };
 
   return (
     <GameContext.Provider value={{
@@ -196,6 +223,10 @@ export function GameProvider({ children }) {
       playLightOnSound,
       playWindowsOnSound,
       playWindowsOffSound,
+      cornerLights,
+      updateCornerLight,
+      gatesSolved,
+      updateGateSolved,
     }}>
       {/* Audio element */}
       <audio ref={audioRef} src="/bgm.mp3" />

@@ -9,7 +9,7 @@ const Wall1 = () => {
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
-  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions, lightCode, playLightOnSound } = useGame();
+  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions, lightCode, playLightOnSound, cornerLights, gatesSolved, updateCornerLight } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -281,6 +281,17 @@ const Wall1 = () => {
     }
   };
 
+  // Add useEffect to monitor gatesSolved status
+  useEffect(() => {
+    const cornerOrder = [0, 1, 3, 2]; // Top-left, Top-right, Bottom-right, Bottom-left
+    gatesSolved.forEach((isSolved, index) => {
+      if (isSolved) {
+        updateCornerLight(cornerOrder[index]);
+        console.log(`Gate ${index + 1} solved, updating corner light ${cornerOrder[index]}`); // Add logging
+      }
+    });
+  }, [gatesSolved, updateCornerLight]); // Add updateCornerLight to dependencies
+
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden">
       <div className="relative w-full h-full">
@@ -331,6 +342,43 @@ const Wall1 = () => {
               transition: 'background-position 0.05s ease-out',
             }}
           ></div>
+        )}
+
+        {/* Corner Lights - Add this right after your torchlight overlay */}
+        {isDark && (
+          <>
+            {/* Top Left Corner */}
+            <div 
+              className={`absolute top-8 left-8 w-6 h-6 rounded-full transition-all duration-500 z-20
+                ${cornerLights[0] 
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                  : 'bg-gray-800'}`}
+            />
+            
+            {/* Top Right Corner */}
+            <div 
+              className={`absolute top-8 right-8 w-6 h-6 rounded-full transition-all duration-500 z-20
+                ${cornerLights[1] 
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                  : 'bg-gray-800'}`}
+            />
+            
+            {/* Bottom Right Corner */}
+            <div 
+              className={`absolute bottom-8 right-8 w-6 h-6 rounded-full transition-all duration-500 z-20
+                ${cornerLights[3] 
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                  : 'bg-gray-800'}`}
+            />
+            
+            {/* Bottom Left Corner */}
+            <div 
+              className={`absolute bottom-8 left-8 w-6 h-6 rounded-full transition-all duration-500 z-20
+                ${cornerLights[2] 
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                  : 'bg-gray-800'}`}
+            />
+          </>
         )}
       </div>
 

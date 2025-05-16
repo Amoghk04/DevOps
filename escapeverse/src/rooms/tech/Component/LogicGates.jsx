@@ -124,6 +124,7 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         gateOutputStates,
         saveGateOutputs,
         setLightCode,
+        updateCornerLight, // Add this
     } = useGame();
     const outputPositionsRef = useRef([]);
     const { playGateSolveSound } = useGame();
@@ -398,8 +399,10 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
                 setGateActiveState(gateNumber, true);
                 // Make sure to save the correct outputs
                 saveGateOutputs(gateNumber, userOutputs);
-
                 
+                // Add this line to update the corresponding corner light
+                const cornerOrder = [0, 1, 3, 2]; // Top-left, Top-right, Bottom-right, Bottom-left
+                updateCornerLight(cornerOrder[gateNumber - 1]); // gateNumber is 1-based
             }
         }
     };

@@ -5,7 +5,13 @@ import LogicGatePuzzle from './LogicGates';
 const GateComponent = ({ gatePositions, onGateClick }) => {
   const [activeGate, setActiveGate] = useState(null);
   const gateOverlayRef = useRef(null);
-  const { getOrCreateCircuit } = useGame();
+  const { 
+    gateOutputStates, 
+    saveGateOutputs, 
+    playGateSolveSound,
+    updateGateSolved,
+    getOrCreateCircuit 
+  } = useGame();
 
   // Handle gate click
   const handleGateClick = (gateNumber) => {
@@ -32,6 +38,12 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [activeGate]);
+
+  const handleGateSuccess = (gateNumber) => {
+    playGateSolveSound();
+    // Convert gate number to 0-based index
+    updateGateSolved(gateNumber - 1);
+  };
 
   return (
     <>
