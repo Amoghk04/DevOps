@@ -8,7 +8,12 @@ function CreateRoom() {
         console.log("Creating room as host");
         localStorage.setItem("isRoomHost", "true");
         localStorage.setItem("roomHostId", roomId);
-        navigate(`/room/${roomId}?theme=${themeKey}&creator=true`);
+        if (themeKey == "tech") {
+            navigate(`/room/${roomId}?theme=${themeKey}&creator=true`);
+        } else {
+            alert("This page is still under development");
+            navigate('/home');
+        }
     };
     
     const navigate = useNavigate();
