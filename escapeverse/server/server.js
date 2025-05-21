@@ -1,9 +1,56 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Configure dotenv before using process.env
+dotenv.config({ path: './.env' })
 
 const app = express();
 const server = http.createServer(app);
+const port = 3001;
+
+app.use(cors());
+app.use(express.json());
+
+const password = process.env.MONGO_PASS;
+if (!password) {
+  console.error('MongoDB password not found in environment variables');
+  process.exit(1);
+}
+
+// MongoDB Connection
+mongoose.connect(`mongodb+srv://devops:${password}@cluster0.w5ivypc.mongodb.net/escapeverse?retryWrites=true&w=majority`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
+
+// User Schema
+const userSchema = new mongoose.Schema({
+  uid: { type: String, required: true, unique: true },
+  email: String,
+  displayName: String,
+  createdAt: Date,
+});
+
+// User Model
+const User = mongoose.model('User', userSchema);
+
+// Create User Endpoint
+app.post('/api/create-user', async (req, res) => {
+  try {
+    const newUser = new User(req.body);
+    await newUser.save();
+    res.status(201).send({ message: 'User created successfully' });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).send({ message: 'Failed to create user', error: error.message });
+  }
+});
 
 const io = new Server(server, {
   cors: {
@@ -12,11 +59,37 @@ const io = new Server(server, {
   }
 });
 
+export { io };
+
 // Store both players and host information for each room
 const rooms = {};
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
+
+  socket.on("user-login", async ({ uid, email, displayName }) => {
+    try {
+      // Check if the user already exists
+      const existingUser = await User.findOne({ uid });
+
+      if (!existingUser) {
+        // Create a new user document
+        const newUser = new User({
+          uid,
+          email,
+          displayName: displayName || "New User",
+          createdAt: new Date()
+        });
+
+        await newUser.save();
+        console.log(`New user saved to MongoDB: ${uid}`);
+      } else {
+        console.log(`User already exists in MongoDB: ${uid}`);
+      }
+    } catch (error) {
+      console.error("Error saving user to MongoDB:", error);
+    }
+  });
 
   socket.on("join-room", ({ roomId, username, isCreator }) => {
     console.log(`User ${socket.id} (${username}) joining room ${roomId}. Is creator: ${isCreator}`);
@@ -123,6 +196,6 @@ function handlePlayerLeave(socket, roomId) {
   });
 }
 
-server.listen(3001, () => {
-  console.log("Socket.IO server running on port 3001");
+server.listen(port, () => {
+  console.log(`Socket.IO server running on port ${port}`);
 });

@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import googleLogo from "./assets/google.webp";
 import { useNavigate } from 'react-router-dom';
+import { socket } from './socket';
 
 export default function AuthForm() {
   const navigate = useNavigate();
@@ -24,16 +25,24 @@ export default function AuthForm() {
     try {
       if (isLogin) {
         // Handle Login
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // Emit login event
+        socket.emit("user-login", {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          displayName: userCredential.user.displayName
+        });
         navigate('/home');
       } else {
         // Handle Sign Up
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        // Wait for the auth state to be ready
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        if (userCredential.user) {
-          navigate('/create-profile');
-        }
+        // Emit login event for new users
+        socket.emit("user-login", {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          displayName: "New User"
+        });
+        navigate('/create-profile');
       }
     } catch (err) {
       setError(err.message);
@@ -48,10 +57,18 @@ export default function AuthForm() {
       });
       
       const result = await signInWithPopup(auth, provider);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Emit login event
+      socket.emit("user-login", {
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: result.user.displayName
+      });
       
-      // Always redirect to profile creation for Google sign-ups
-      navigate('/create-profile');
+      if (result.additionalUserInfo.isNewUser) {
+        navigate('/create-profile');
+      } else {
+        navigate('/home');
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -59,8 +76,13 @@ export default function AuthForm() {
 
   const handleGuestAuth = async () => {
     try {
-      await signInAnonymously(auth);
-      alert("You’re now logged in as a Guest!");
+      const result = await signInAnonymously(auth);
+      // Emit login event for guest users
+      socket.emit("user-login", {
+        uid: result.user.uid,
+        displayName: "Guest"
+      });
+      navigate('/create-profile');
     } catch (err) {
       setError(err.message);
     }
