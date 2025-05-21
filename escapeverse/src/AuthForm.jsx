@@ -32,6 +32,7 @@ export default function AuthForm() {
           email: userCredential.user.email,
           displayName: userCredential.user.displayName
         });
+        // Check if the user is new
         navigate('/home');
       } else {
         // Handle Sign Up

@@ -11,6 +11,7 @@ import Wall1 from './rooms/wall1';
 import Wall2 from './rooms/wall2';
 import Wall3 from './rooms/wall3';
 import Wall4 from './rooms/wall4';
+import CreateProfile from './CreateProfile';
 
 function App() {
   const { user, loading } = useUser();
@@ -61,6 +62,10 @@ function App() {
           <Route
             path="/home"
             element={user ? <LandingPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/create-profile"
+            element={<CreateProfile />}
           />
           <Route path="/create-room" element={<CreateRoom />} />
           <Route path="/room/:roomId" element={<RoomLobby />} />
