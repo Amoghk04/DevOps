@@ -5,35 +5,53 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  signInAnonymously, // <-- Add this
+  signInAnonymously,
 } from "firebase/auth";
 import googleLogo from "./assets/google.webp";
+import { useNavigate } from 'react-router-dom';
 
 export default function AuthForm() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
 
-  const handleAuth = async () => {
+  const handleAuth = async (e) => {
+    e.preventDefault();
     setError("");
+    
     try {
       if (isLogin) {
+        // Handle Login
         await signInWithEmailAndPassword(auth, email, password);
+        navigate('/home');
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Handle Sign Up
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Wait for the auth state to be ready
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (userCredential.user) {
+          navigate('/create-profile');
+        }
       }
-      alert("Success!");
     } catch (err) {
       setError(err.message);
     }
   };
 
   const handleGoogleAuth = async () => {
-    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      alert("Logged in with Google!");
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
+      const result = await signInWithPopup(auth, provider);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Always redirect to profile creation for Google sign-ups
+      navigate('/create-profile');
     } catch (err) {
       setError(err.message);
     }
