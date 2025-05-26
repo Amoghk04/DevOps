@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Terminal, XCircle, Code, Send, AlertCircle } from 'lucide-react';
 import { debuggingChallenges } from './debuggingChallenges';
 import { useGame } from '../../GameProvider';
@@ -15,7 +15,11 @@ const ServerScreen = ({ isOpen, onClose, isSecondServer = false }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [accessCode, setAccessCode] = useState('');
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [completionCode, setCompletionCode] = useState('');
+  const [challengesCompleted, setChallengesCompleted] = useState(false);
   const { setServer2Code } = useGame();
+accessCode;
 
   if (!isOpen) return null;
 
@@ -34,9 +38,21 @@ const ServerScreen = ({ isOpen, onClose, isSecondServer = false }) => {
 help - Display this help message
 status - Check server status
 logs - View recent logs
-debug - Start debugging challenge
+debug - Start debugging challenge${challengesCompleted ? '\ncode - Reveal Server 2 access code' : ''}
 exit - Close terminal`
       };
+    } else if (command === 'code') {
+      if (challengesCompleted) {
+        response = {
+          type: 'system',
+          content: `Server 2 Access Code: ${accessCode}\n⚠️ Store this code safely - you'll need it to access Server 2`
+        };
+      } else {
+        response = {
+          type: 'error',
+          content: 'Access denied. Complete all debugging challenges first.'
+        };
+      }
     } else if (command === 'debug') {
       setShowDebugger(true);
       setUserCode(debuggingChallenges[currentChallenge].buggyCode);
@@ -74,42 +90,24 @@ Network: ACTIVE`
     try {
       await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500));
       
-      // Check if code is correct (you can add your validation logic here)
       const isCorrect = true; // For testing, always true
     
       if (isCorrect) {
         setSuccess(true);
         
-        // If this is the last challenge (index 2 for 3rd challenge)
         if (currentChallenge === 2) {
-          // Generate 6-digit code
           const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
           setAccessCode(generatedCode);
-          setServer2Code(generatedCode); // Store the code for server 2
-          
-          // Show success message with the code
-          setTerminalHistory(prev => [
-            ...prev,
-            {
-              type: 'system',
-              content: '🎉 Congratulations! All debugging challenges completed!'
-            },
-            {
-              type: 'system',
-              content: `Server 2 Access Code: ${generatedCode}`
-            },
-            {
-              type: 'system',
-              content: '⚠️ Store this code safely - you\'ll need it to access Server 2'
-            }
-          ]);
-          
-          // Close debugger and show terminal
+          setServer2Code(generatedCode);
+          setChallengesCompleted(true);
           setShowDebugger(false);
-          setSuccess(true);
-        } 
-        // If there are more challenges, move to the next one
-        else if (currentChallenge < debuggingChallenges.length - 1) {
+          
+          // Add completion message to terminal
+          setTerminalHistory(prev => [...prev, 
+            { type: 'system', content: '🎉 All debugging challenges completed!' },
+            { type: 'system', content: 'Type "help" to see available commands.' }
+          ]);
+        } else if (currentChallenge < debuggingChallenges.length - 1) {
           setTimeout(() => {
             setCurrentChallenge(prev => prev + 1);
             setUserCode(debuggingChallenges[currentChallenge + 1].buggyCode);

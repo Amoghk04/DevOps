@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.post('/verify-code', async (req, res) => {
-  const { code, challengeId } = req.body;
+  const { challengeId } = req.body;
 
   try {
     // Mock verification that always passes
