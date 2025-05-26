@@ -83,11 +83,14 @@ io.on("connection", (socket) => {
 
         await newUser.save();
         console.log(`New user saved to MongoDB: ${uid}`);
+        callback({ success: true, message: "User created successfully" });
       } else {
         console.log(`User already exists in MongoDB: ${uid}`);
+        callback({ success: true, message: "User exists" });
       }
     } catch (error) {
       console.error("Error saving user to MongoDB:", error);
+      callback({ success: false, error: error.message });
     }
   });
 

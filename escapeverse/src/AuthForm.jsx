@@ -26,23 +26,35 @@ export default function AuthForm() {
       if (isLogin) {
         // Handle Login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        // Emit login event
+        // Emit login event with callback
         socket.emit("user-login", {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
           displayName: userCredential.user.displayName
+        }, (response) => {
+          if (response.success) {
+            console.log("Server response:", response.message);
+            navigate('/home');
+          } else {
+            setError(response.error);
+          }
         });
-        navigate('/home');
       } else {
         // Handle Sign Up
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        // Emit login event for new users
+        // Emit login event with callback
         socket.emit("user-login", {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
           displayName: "New User"
+        }, (response) => {
+          alert(response.message);
+          if (response.message === "User created successfully") {
+            navigate('/create-profile');
+          } else {
+            navigate('/home');
+          }
         });
-        navigate('/create-profile');
       }
     } catch (err) {
       setError(err.message);
@@ -57,18 +69,18 @@ export default function AuthForm() {
       });
       
       const result = await signInWithPopup(auth, provider);
-      // Emit login event
+      // Emit login event with callback
       socket.emit("user-login", {
         uid: result.user.uid,
         email: result.user.email,
         displayName: result.user.displayName
+      }, (response) => {
+        if (response.message === "User created successfully") {
+          navigate('/create-profile');
+        } else {
+          navigate('/home');
+        }
       });
-      
-      if (result.additionalUserInfo.isNewUser) {
-        navigate('/create-profile');
-      } else {
-        navigate('/home');
-      }
     } catch (err) {
       setError(err.message);
     }
@@ -77,12 +89,17 @@ export default function AuthForm() {
   const handleGuestAuth = async () => {
     try {
       const result = await signInAnonymously(auth);
-      // Emit login event for guest users
+      // Emit login event for guest users with callback
       socket.emit("user-login", {
         uid: result.user.uid,
         displayName: "Guest"
+      }, (response) => {
+        if (response.message === "User created successfully") {
+          navigate('/create-profile');
+        } else {
+          navigate('/home');
+        }
       });
-      navigate('/create-profile');
     } catch (err) {
       setError(err.message);
     }

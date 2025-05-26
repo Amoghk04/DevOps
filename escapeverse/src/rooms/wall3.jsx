@@ -3,14 +3,17 @@ import InteractiveImageMap from '../InteractiveImageMap';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from './GameProvider';
 import ServerScreen from './tech/Component/ServerScreen';
+import Server2Screen from './tech/Component/Server2Screen';
 import CodePrompt from './tech/Component/codePrompt';
+import ErrorBoundary from '../components/ErrorBoundary';
 
-const Wall2 = () => {
+const Wall3 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark } = useGame();
     const { serverRoomKey } = useGame();
-    const [showServerScreen, setShowServerScreen ] = useState(false);
+    const [showServer1Screen, setShowServer1Screen] = useState(false);
+    const [showServer2Screen, setShowServer2Screen] = useState(false);
     const [showCodePrompt, setShowCodePrompt] = useState(false);
 
     // Define interactive areas specific to the left wall
@@ -30,6 +33,8 @@ const Wall2 = () => {
             coords: "500,138,755,139,755,639,499,640",
             onClick: () => {
                 console.log('server-2 clicked!');
+                console.log(`${server2Code}`);
+                setShowServer2Screen(true);
             }
         },
         {
@@ -44,7 +49,7 @@ const Wall2 = () => {
 
     const handleCodeSuccess = () => {
         setShowCodePrompt(false);
-        setShowServerScreen(true);
+        setShowServer1Screen(true);
     }
 
     useEffect(() => {
@@ -77,11 +82,21 @@ const Wall2 = () => {
                     correctCode={serverRoomKey}
                 />
                 
-                {/* Server Screen Component */}
-                <ServerScreen
-                    isOpen={showServerScreen}
-                    onClose={() => setShowServerScreen(false)}
-                />
+                {/* Wrap ServerScreen with ErrorBoundary */}
+                <ErrorBoundary onReset={() => setShowServer1Screen(false)}>
+                  <ServerScreen
+                    isOpen={showServer1Screen}
+                    onClose={() => setShowServer1Screen(false)}
+                  />
+                </ErrorBoundary>
+
+                {/* Wrap Server2Screen with ErrorBoundary */}
+                <ErrorBoundary onReset={() => setShowServer2Screen(false)}>
+                  <Server2Screen
+                    isOpen={showServer2Screen}
+                    onClose={() => setShowServer2Screen(false)}
+                  />
+                </ErrorBoundary>
 
                 {/* Right Arrow Navigation Indicator */}
                 <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
@@ -123,4 +138,4 @@ const Wall2 = () => {
     );
 };
 
-export default Wall2;
+export default Wall3;

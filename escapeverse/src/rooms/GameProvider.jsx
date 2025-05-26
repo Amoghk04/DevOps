@@ -22,6 +22,7 @@ export function GameProvider({ children }) {
   const [isWindowClosed, setIsWindowClosed] = useState(true);
   const [cornerLights, setCornerLights] = useState([false, false, false, false]);
   const [gatesSolved, setGatesSolved] = useState([false, false, false, false]);
+  const [server2Code, setServer2Code] = useState('');
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
@@ -181,53 +182,57 @@ export function GameProvider({ children }) {
     });
   };
 
+  const value = {
+    isDark,
+    setIsDark,
+    isPowerOn,
+    setIsPowerOn,
+    wall1GatePositions,
+    setWall1GatePositions,
+    wall2GatePositions,
+    setWall2GatePositions,
+    wall3GatePositions,
+    setWall3GatePositions,
+    wall4GatePositions,
+    setWall4GatePositions,
+    gateCircuits,
+    getOrCreateCircuit,
+    isGateActive,
+    setIsGateActive,
+    gateOutputStates,
+    saveGateOutputs,
+    gateActiveStates,
+    setGateActiveState,
+    lightCode,
+    setLightCode,
+    generatedPattern,
+    setGeneratedPattern,
+    serverRoomKey,
+    setServerRoomKey,
+    hiddenTiles,
+    setHiddenTiles,
+    isWindowClosed,
+    setIsWindowClosed,
+    isBgmPlaying,
+    playBackgroundMusic,
+    playErrorSound,
+    playOnlineSound,
+    playWireSound,
+    stopWireSound,
+    playGateSolveSound,
+    playLightOnSound,
+    playWindowsOnSound,
+    playWindowsOffSound,
+    cornerLights,
+    updateCornerLight,
+    gatesSolved,
+    updateGateSolved,
+    server2Code,
+    setServer2Code
+  };
+
   return (
-    <GameContext.Provider value={{
-      isDark,
-      setIsDark,
-      isPowerOn,
-      setIsPowerOn,
-      wall1GatePositions,
-      setWall1GatePositions,
-      wall2GatePositions,
-      setWall2GatePositions,
-      wall3GatePositions,
-      setWall3GatePositions,
-      wall4GatePositions,
-      setWall4GatePositions,
-      gateCircuits,
-      getOrCreateCircuit,
-      isGateActive,
-      setIsGateActive,
-      gateOutputStates,
-      saveGateOutputs,
-      gateActiveStates,
-      setGateActiveState,
-      lightCode,
-      setLightCode,
-      generatedPattern,
-      setGeneratedPattern,
-      serverRoomKey,
-      setServerRoomKey,
-      hiddenTiles,
-      setHiddenTiles,
-      isWindowClosed,
-      setIsWindowClosed,
-      isBgmPlaying,
-      playBackgroundMusic,
-      playErrorSound,
-      playOnlineSound,
-      playWireSound,
-      stopWireSound,
-      playGateSolveSound,
-      playLightOnSound,
-      playWindowsOnSound,
-      playWindowsOffSound,
-      cornerLights,
-      updateCornerLight,
-      gatesSolved,
-      updateGateSolved,
-    }}>
+    <GameContext.Provider value={value}>
       {/* Audio element */}
       <audio ref={audioRef} src="/bgm.mp3" />
       <audio ref={errorAudioRef} src="/error.mp3" />
