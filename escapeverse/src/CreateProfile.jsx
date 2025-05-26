@@ -1,11 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,  } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
+import googleLogo from "./assets/google.webp";
+import { auth } from "./firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInAnonymously,
+} from "firebase/auth";
+import { socket } from './socket';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function IconCarousel() {
     // Total number of icons in the 3x3 grid
+
     const totalIcons = 9;
     const [currentIndex, setCurrentIndex] = useState(0);
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     // Names for each icon (for accessibility and display)
     const iconNames = [
@@ -45,8 +63,70 @@ export default function IconCarousel() {
         setUsername(e.target.value);
     };
 
-    const handleSubmit = () => {
-        console.log(`Selected icon: ${iconNames[currentIndex]}, Username: ${username}`);
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPassword(e.target.value);
+        if (e.target.value !== password) {
+            setError("Passwords do not match");
+        } else {
+            setError("");
+        }
+    };
+
+    const handleAuth = async (e) => {
+        e.preventDefault();
+        setError("");
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // Emit login event for new users
+            socket.emit("user-login", {
+                uid: userCredential.user.uid,
+                email: userCredential.user.email,
+                displayName: username,
+                profileIndex: currentIndex,
+            });
+            navigate('/home');
+
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleGoogleAuth = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
+
+            const result = await signInWithPopup(auth, provider);
+            // Emit login event
+            socket.emit("user-login", {
+                uid: result.user.uid,
+                email: result.user.email,
+                displayName: username,
+                profileIndex: currentIndex,
+            });
+
+            navigate('/home');
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleGuestAuth = async () => {
+        try {
+            const result = await signInAnonymously(auth);
+            // Emit login event for guest users
+            socket.emit("user-login", {
+                uid: result.user.uid,
+                displayName: username,
+                profileIndex: currentIndex,
+            });
+            navigate('/home');
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     return (
@@ -131,13 +211,58 @@ export default function IconCarousel() {
                 </div>
             </div>
 
-            {/* Continue button */}
+            <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-2 mb-4 rounded-md bg-white text-black"
+            />
+            <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-2 mb-4 rounded-md bg-white text-black"
+            />
+
+            <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                className="w-full p-2 mb-4 rounded-md bg-white text-black"
+            />
+            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+
             <button
-                className="w-full py-3 bg-white-600 text-black rounded-lg"
-                onClick={() => console.log(`Selected icon: ${iconNames[currentIndex]}`)}
+                onClick={handleAuth}
+                className="w-full py-2 px-4 mb-4 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-                Continue {'>'}
+                {"Sign Up"}
             </button>
+
+
+            <div className="flex gap-4">
+                <button
+                    onClick={handleGoogleAuth}
+                    className="flex-1 flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                    <img src={googleLogo} alt="Google" className="w-5 h-5" />
+                    <span className="text-sm text-gray-700 dark:text-gray-200">
+                        Sign up with Google
+                    </span>
+                </button>
+
+                <button
+                    onClick={handleGuestAuth}
+                    className="flex-1 py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                >
+                    Continue as Guest
+                </button>
+            </div>
+
         </div>
+
     );
 }

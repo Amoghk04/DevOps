@@ -15,36 +15,25 @@ export default function AuthForm() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
 
   const handleAuth = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     try {
-      if (isLogin) {
-        // Handle Login
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        // Emit login event
-        socket.emit("user-login", {
-          uid: userCredential.user.uid,
-          email: userCredential.user.email,
-          displayName: userCredential.user.displayName
-        });
-        // Check if the user is new
-        navigate('/home');
-      } else {
-        // Handle Sign Up
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        // Emit login event for new users
-        socket.emit("user-login", {
-          uid: userCredential.user.uid,
-          email: userCredential.user.email,
-          displayName: "New User"
-        });
-        navigate('/create-profile');
-      }
+
+      // Handle Login
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Emit login event
+      socket.emit("user-login", {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName
+      });
+      // Check if the user is new
+      navigate('/home');
+
     } catch (err) {
       setError(err.message);
     }
@@ -56,7 +45,7 @@ export default function AuthForm() {
       provider.setCustomParameters({
         prompt: 'select_account'
       });
-      
+
       const result = await signInWithPopup(auth, provider);
       // Emit login event
       socket.emit("user-login", {
@@ -64,7 +53,7 @@ export default function AuthForm() {
         email: result.user.email,
         displayName: result.user.displayName
       });
-      
+
       if (result.additionalUserInfo.isNewUser) {
         navigate('/create-profile');
       } else {
@@ -110,7 +99,7 @@ export default function AuthForm() {
         onClick={handleAuth}
         className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
-        {isLogin ? "Login" : "Sign Up"}
+        {"Sign Up"}
       </button>
       <div className="flex gap-4">
         <button
@@ -132,9 +121,9 @@ export default function AuthForm() {
       </div>
       <p
         className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer underline text-center"
-        onClick={() => setIsLogin(!isLogin)}
+        onClick={() => navigate("/create-profile")}
       >
-        {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+        {"Don't have an account? Sign Up"}
       </p>
     </div>
   );
