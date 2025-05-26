@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   displayName: String,
   createdAt: Date,
+  profileIndex: Number,
 });
 
 // User Model
@@ -67,19 +68,22 @@ const rooms = {};
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.on("user-login", async ({ uid, email, displayName }) => {
+  socket.on("user-login", async ({ uid, email, displayName, profileIndex }) => {
     try {
       // Check if the user already exists
       const existingUser = await User.findOne({ uid });
-
+      console.log(`Outside -- Profile index ${profileIndex} for user ${uid}`);
+      
       if (!existingUser) {
         // Create a new user document
         const newUser = new User({
           uid,
           email,
           displayName: displayName || "New User",
-          createdAt: new Date()
+          createdAt: new Date(),
+          profileIndex,
         });
+        console.log(`Profile index ${profileIndex} for user ${uid}`);
 
         await newUser.save();
         console.log(`New user saved to MongoDB: ${uid}`);
