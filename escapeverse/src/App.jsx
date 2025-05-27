@@ -27,28 +27,24 @@ function App() {
   return (
     <Router>
       <div
-        className="min-h-screen w-full flex items-center justify-end relative px-10"
+        className="min-h-screen w-full flex items-center relative"
         style={{
           backgroundImage: 'url(/bg1.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundColor: '#1a1a1a', // fallback in case image doesn't load
+          backgroundColor: '#1a1a1a',
         }}
       >
-        {/* Dark overlay on top of the background */}
-        {/* You can adjust opacity to control how dark the background becomes */}
+        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black opacity-0 pointer-events-none z-0" />
-        {/* ↑ 50% darkness — try 0.3 for lighter, or 0.7 for darker */}
 
         <Routes>
           <Route
             path="/"
             element={
               !user ? (
-                <div
-                  className="relative z-10 bg-black/60 p-8 rounded-xl shadow-2xl w-full max-w-md text-white custom-margin"
-                >
+                <div className="relative z-10 bg-black/60 p-8 rounded-xl shadow-2xl w-full max-w-md text-white ml-auto mr-10">
                   <p className="text-2xl font-bold text-center mb-4 text-yellow-300">
                     Log in to continue your Journey.
                   </p>
@@ -61,7 +57,13 @@ function App() {
           />
           <Route
             path="/home"
-            element={user ? <LandingPage /> : <Navigate to="/" />}
+            element={user ? (
+              <div className="w-full min-h-screen">
+                <LandingPage />
+              </div>
+            ) : (
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/create-profile"
@@ -69,7 +71,14 @@ function App() {
           />
           <Route path="/create-room" element={<CreateRoom />} />
           <Route path="/room/:roomId" element={<RoomLobby />} />
-          <Route path="/join-room" element={<JoinRoom />} />
+          <Route 
+            path="/join-room" 
+            element={
+              <div className="relative z-10 bg-black/60 p-8 rounded-xl shadow-2xl w-full max-w-md text-white ml-auto mr-10">
+                <JoinRoom />
+              </div>
+            } 
+          />
           {/* game rooms */}
           <Route path="/game/:roomId/tech" element={
             <GameProvider>

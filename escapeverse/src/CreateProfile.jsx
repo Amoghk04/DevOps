@@ -1,17 +1,16 @@
-import { useState, useEffect,  } from 'react';
+import { useState, useEffect, } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 import googleLogo from "./assets/google.webp";
 import { auth } from "./firebase";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInAnonymously,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInAnonymously,
 } from "firebase/auth";
 import { socket } from './socket';
 import { useNavigate } from 'react-router-dom';
-
 
 export default function IconCarousel() {
     // Total number of icons in the 3x3 grid
@@ -78,7 +77,10 @@ export default function IconCarousel() {
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            // Emit login event for new users
+            // Store both username and profile index
+            localStorage.setItem("username", username);
+            localStorage.setItem("profileIndex", currentIndex);
+            
             socket.emit("user-login", {
                 uid: userCredential.user.uid,
                 email: userCredential.user.email,
@@ -107,6 +109,8 @@ export default function IconCarousel() {
                 displayName: username,
                 profileIndex: currentIndex,
             });
+            localStorage.setItem("username", username);
+            localStorage.setItem("profileIndex", currentIndex);
 
             navigate('/home');
         } catch (err) {
@@ -123,6 +127,9 @@ export default function IconCarousel() {
                 displayName: username,
                 profileIndex: currentIndex,
             });
+            localStorage.setItem("username", username);
+            localStorage.setItem("profileIndex", currentIndex);
+
             navigate('/home');
         } catch (err) {
             setError(err.message);
