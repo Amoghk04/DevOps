@@ -7,9 +7,12 @@ import TileGrid from './tech/Component/Tiles';
 const Wall4 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const { isDark, isWindowClosed, setIsWindowClosed } = useGame();
+    const { isDark, isWindowClosed, setIsWindowClosed, wall3code } = useGame();
     const [currentImage, setCurrentImage] = useState("/wall4-closed.png");
     const [showTileGrid, setShowTileGrid] = useState(false); // State to control tile grid visibility
+    const [pinCode, setPinCode] = useState('');
+    const [showPinInput, setShowPinInput] = useState(false);
+    const [pinError, setPinError] = useState('');
 
     // Define interactive areas specific to the left wall
     const areas = [
@@ -38,13 +41,15 @@ const Wall4 = () => {
             id: 'closed-window',
             coords: "484,121,984,121,982,754,481,754",
             onClick: () => {
+                console.log(wall3code);
+
             },
         },
         {
             id: 'passcode',
             coords: "1021,305,1066,305,1067,357,1021,357",
             onClick: () => {
-                setIsWindowClosed(false); // Set the window state to open
+                setShowPinInput(true);
             }
         }
     ]
@@ -116,6 +121,56 @@ const Wall4 = () => {
                             <div className="text-center mb-4">
                             </div>
                             <TileGrid />
+                        </div>
+                    </div>
+                )}
+
+                {/* Pin Code Input Modal */}
+                {showPinInput && (
+                    <div className="absolute inset-0 flex items-center justify-center z-20">
+                        <div className="bg-black bg-opacity-70 absolute inset-0" 
+                             onClick={() => setShowPinInput(false)}></div>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl relative z-30">
+                            <button
+                                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                onClick={() => setShowPinInput(false)}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <div className="text-center">
+                                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Enter Security Code</h3>
+                                <input
+                                    type="password"
+                                    value={pinCode}
+                                    onChange={(e) => {
+                                        setPinCode(e.target.value);
+                                        setPinError('');
+                                    }}
+                                    className="w-full px-4 py-2 border rounded-lg mb-4 text-center text-lg"
+                                    maxLength="6"
+                                    placeholder="******"
+                                />
+                                {pinError && (
+                                    <p className="text-red-500 mb-4">{pinError}</p>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        if (pinCode === wall3code) {
+                                            setIsWindowClosed(false);
+                                            setShowPinInput(false);
+                                            setPinCode('');
+                                        } else {
+                                            setPinError('Incorrect code. Try again.');
+                                            setPinCode('');
+                                        }
+                                    }}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                                >
+                                    Submit
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}

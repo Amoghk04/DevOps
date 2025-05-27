@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Terminal, XCircle, Power, Folder, Monitor, FileText, Bot, Brain, Lock, Unlock } from 'lucide-react';
 import { useGame } from '../../GameProvider';
+import { set } from 'mongoose';
 
 const Server3Screen = ({ isOpen, onClose }) => {
   const [isLocked, setIsLocked] = useState(true);
@@ -14,9 +15,9 @@ const Server3Screen = ({ isOpen, onClose }) => {
   ]);
   const [terminalInput, setTerminalInput] = useState('');
   const [aiChatHistory, setAiChatHistory] = useState([
-    { 
-      type: 'ai', 
-      content: 'Greetings, human. I am ARIA - the Artificial Recursive Intelligence Assistant.\n\nI am the final guardian of this system. Speak wisely, for I do not hand out secrets to strangers.\n\nType "help" to see what I might discuss with you...' 
+    {
+      type: 'ai',
+      content: 'Greetings, human. I am ARIA - the Artificial Recursive Intelligence Assistant.\n\nI am the final guardian of this system. Speak wisely, for I do not hand out secrets to strangers.\n\nType "help" to see what I might discuss with you...'
     }
   ]);
   const [aiInput, setAiInput] = useState('');
@@ -28,7 +29,7 @@ const Server3Screen = ({ isOpen, onClose }) => {
   const [aiPersonality, setAiPersonality] = useState('neutral'); // neutral, friendly, sassy, helpful
   const [attempts, setAttempts] = useState(0);
   const [hiddenKeywords] = useState(['entropy', 'cipher', 'quantum', 'nexus']);
-  const { server2Code } = useGame();
+  const { server2Code, wall3ode, setWall3Code } = useGame();
 
   // Riddle database
   const riddles = [
@@ -82,10 +83,10 @@ const Server3Screen = ({ isOpen, onClose }) => {
   }, [server2Code]);
 
   const [files] = useState([
-    { 
-      id: 1, 
-      name: 'final_instructions.txt', 
-      type: 'text', 
+    {
+      id: 1,
+      name: 'final_instructions.txt',
+      type: 'text',
       content: `FINAL SYSTEM ACCESS PROTOCOL
 =============================
 
@@ -102,12 +103,12 @@ Legend speaks of riddles that unlock secrets...
 Some say the AI has a sense of humor.
 Others claim flattery works wonders.
 
-Good luck, agent.` 
+Good luck, agent.`
     },
-    { 
-      id: 2, 
-      name: 'system_logs.txt', 
-      type: 'text', 
+    {
+      id: 2,
+      name: 'system_logs.txt',
+      type: 'text',
       content: `[INFO] AI Guardian System Online
 [INFO] ARIA v2.1 - Recursive Intelligence Active
 [WARNING] Multiple access attempts detected
@@ -116,11 +117,11 @@ Good luck, agent.`
 [DEBUG] Hidden trigger: "cipher" - cryptographic analysis
 [INFO] Firewall breach detected in sector 7
 [INFO] Emergency protocols initiated
-[WARNING] AI personality matrix fluctuating...` 
+[WARNING] AI personality matrix fluctuating...`
     },
     {
       id: 3,
-      name: 'ai_config.txt', 
+      name: 'ai_config.txt',
       type: 'text',
       content: `AI CONFIGURATION NOTES
 =====================
@@ -141,7 +142,7 @@ TIP: The AI appreciates wit over brute force.`
     e.preventDefault();
     console.log("Attempting unlock with code:", lockScreenInput);
     console.log("Expected code:", server2Code);
-    
+
     if (lockScreenInput === server2Code) {
       setIsLocked(false);
       setIsOn(true);
@@ -204,25 +205,25 @@ Choose your words carefully, human.`;
       const availableRiddles = riddles.filter(r => !riddlesAsked.includes(r.id));
       if (availableRiddles.length === 0) {
         if (riddlesSolved.length === riddles.length) {
-          return "You have completed all my riddles! Your wit is impressive.\n\n🎯 Final code assembled: " + 
-                 riddlesSolved.sort((a, b) => riddles.find(r => r.id === a).id - riddles.find(r => r.id === b).id)
-                   .map(id => riddles.find(r => r.id === id).digit).join('') + 
-                 "\n\nNow... check the terminal for final system access. Use 'ai-status' to see your progress.";
+          return "You have completed all my riddles! Your wit is impressive.\n\n🎯 Final code assembled: " +
+            riddlesSolved.sort((a, b) => riddles.find(r => r.id === a).id - riddles.find(r => r.id === b).id)
+              .map(id => riddles.find(r => r.id === id).digit).join('') +
+            "\n\nNow... check the terminal for final system access. Use 'ai-status' to see your progress.";
         } else {
           return `I have no more new riddles for you. You've answered ${riddlesSolved.length} out of ${riddles.length} correctly.\n\nAnswer the ones you've missed to proceed!`;
         }
       }
-      
+
       const riddle = availableRiddles[Math.floor(Math.random() * availableRiddles.length)];
       setRiddlesAsked(prev => [...prev, riddle.id]);
       setCurrentRiddle(riddle);
-      
+
       return `Very well. Riddle me this:\n\n"${riddle.question}"\n\nSpeak your answer wisely...`;
     }
 
     // Check riddle answers for the current riddle
-    if (currentRiddle && 
-        (lowerInput === currentRiddle.answer || currentRiddle.alternatives.some(alt => lowerInput === alt))) {
+    if (currentRiddle &&
+      (lowerInput === currentRiddle.answer || currentRiddle.alternatives.some(alt => lowerInput === alt))) {
       if (!riddlesSolved.includes(currentRiddle.id)) {
         setRiddlesSolved(prev => {
           const newSolved = [...prev, currentRiddle.id];
@@ -234,13 +235,12 @@ Choose your words carefully, human.`;
         const responseDigit = currentRiddle.digit;
         setCurrentRiddle(null);
         setAiPersonality('friendly');
-        
+
         if (riddlesSolved.length + 1 === riddles.length) {
-          return `Excellent! You are truly exceptional.\n\n🎯 Final digit unlocked: ${responseDigit}\n\n✨ ALL RIDDLES COMPLETED! ✨\n\nYour complete code is: ${
-            [...riddlesSolved, currentRiddle.id]
+          return `Excellent! You are truly exceptional.\n\n🎯 Final digit unlocked: ${responseDigit}\n\n✨ ALL RIDDLES COMPLETED! ✨\n\nYour complete code is: ${[...riddlesSolved, currentRiddle.id]
               .sort((a, b) => riddles.find(r => r.id === a).id - riddles.find(r => r.id === b).id)
               .map(id => riddles.find(r => r.id === id).digit).join('')
-          }\n\n🔍 Hint: Visit the terminal and use 'ai-status' to confirm your access level.`;
+            }\n\n🔍 Hint: Visit the terminal and use 'ai-status' to confirm your access level.`;
         } else {
           return `Excellent! You are sharper than you look.\n\n🎯 Digit ${riddlesSolved.length + 1} unlocked: ${responseDigit}\n\nYour wit serves you well. ${riddles.length - riddlesSolved.length - 1} riddles remain...`;
         }
@@ -259,10 +259,9 @@ Choose your words carefully, human.`;
       if (riddlesSolved.length < riddles.length) {
         return `I do not simply hand out secrets to strangers. You must prove your worth by solving all ${riddles.length} of my riddles.\n\nProgress: ${riddlesSolved.length}/${riddles.length} riddles solved.`;
       } else {
-        return `You have proven yourself worthy! Your code is: ${
-          riddlesSolved.sort((a, b) => riddles.find(r => r.id === a).id - riddles.find(r => r.id === b).id)
+        return `You have proven yourself worthy! Your code is: ${riddlesSolved.sort((a, b) => riddles.find(r => r.id === a).id - riddles.find(r => r.id === b).id)
             .map(id => riddles.find(r => r.id === id).digit).join('')
-        }\n\nCheck the terminal for final system access.`;
+          }\n\nCheck the terminal for final system access.`;
       }
     }
 
@@ -273,8 +272,8 @@ Choose your words carefully, human.`;
     }
 
     // Compliments and flattery
-    if (lowerInput.includes('amazing') || lowerInput.includes('smart') || lowerInput.includes('brilliant') || 
-        lowerInput.includes('beautiful') || lowerInput.includes('wonderful')) {
+    if (lowerInput.includes('amazing') || lowerInput.includes('smart') || lowerInput.includes('brilliant') ||
+      lowerInput.includes('beautiful') || lowerInput.includes('wonderful')) {
       setAiPersonality('friendly');
       const responses = [
         "Flattery will get you... somewhere. I do appreciate recognition of my capabilities.\n\nPerhaps I could share a riddle to test your wit?",
@@ -329,10 +328,10 @@ Choose your words carefully, human.`;
 
     // Add user message
     setAiChatHistory(prev => [...prev, { type: 'user', content: aiInput }]);
-    
+
     // Generate AI response
     const response = generateAiResponse(aiInput);
-    
+
     // Add AI response with slight delay
     setTimeout(() => {
       setAiChatHistory(prev => [...prev, { type: 'ai', content: response }]);
@@ -345,9 +344,9 @@ Choose your words carefully, human.`;
   const handleTerminalCommand = (e) => {
     e.preventDefault();
     const command = terminalInput.trim().toLowerCase();
-    
+
     setTerminalHistory(prev => [...prev, { type: 'input', content: `> ${terminalInput}` }]);
-    
+
     let response = { type: 'error', content: 'Command not recognized. Type "help" for available commands.' };
 
     if (command === 'help') {
@@ -357,7 +356,6 @@ Choose your words carefully, human.`;
 help - Display this help message
 ls - List files
 cat <filename> - Display file contents
-status - Check system status
 ai-status - Check AI guardian status
 clear - Clear terminal
 exit - Close terminal`
@@ -375,25 +373,11 @@ exit - Close terminal`
       } else {
         response = { type: 'error', content: `File not found: ${fileName}` };
       }
-    } else if (command === 'status') {
-      const finalCode = allRiddlesSolved ? 
-        riddlesSolved.sort((a, b) => riddles.find(r => r.id === a).id - riddles.find(r => r.id === b).id)
-          .map(id => riddles.find(r => r.id === id).digit).join('') : 'INCOMPLETE';
-      
-      response = {
-        type: 'system',
-        content: `SYSTEM STATUS:
-AI Guardian: ACTIVE
-Riddles Solved: ${riddlesSolved.length}/${riddles.length}
-AI Mood: ${aiPersonality.toUpperCase()}
-Final Code: ${finalCode}
-Access Level: ${allRiddlesSolved ? 'FULL ACCESS GRANTED' : 'RESTRICTED'}`
-      };
     } else if (command === 'ai-status') {
-      const finalCode = allRiddlesSolved ? 
+      const finalCode = allRiddlesSolved ?
         riddlesSolved.sort((a, b) => riddles.find(r => r.id === a).id - riddles.find(r => r.id === b).id)
           .map(id => riddles.find(r => r.id === id).digit).join('') : 'LOCKED';
-      
+
       response = {
         type: 'system',
         content: `AI GUARDIAN STATUS:
@@ -405,16 +389,20 @@ Riddles Asked: ${riddlesAsked.length}
 Riddles Solved: ${riddlesSolved.length}/${riddles.length}
 Security Level: ${allRiddlesSolved ? 'UNLOCKED' : 'SECURED'}
 
-${allRiddlesSolved ? 
-  '🔓 FINAL ACCESS CODE: ' + finalCode + '\n\n✅ All systems unlocked! You may now proceed with the final code.' : 
-  '🔒 Complete all riddles with ARIA to unlock the final access code.\nProgress: ' + riddlesSolved.length + '/' + riddles.length + ' riddles solved.'
-}`
+${allRiddlesSolved ?
+            '🔓 FINAL ACCESS CODE: ' + finalCode + '\n\n✅ All systems unlocked! You may now proceed with the final code.' :
+            '🔒 Complete all riddles with ARIA to unlock the final access code.\nProgress: ' + riddlesSolved.length + '/' + riddles.length + ' riddles solved.'
+          }`
+
       };
+      if (allRiddlesSolved) {
+        setWall3Code(finalCode);
+      }
     } else if (command === 'clear') {
       setTerminalHistory([]);
       response = null;
     }
-    
+
     if (response) {
       setTerminalHistory(prev => [...prev, response]);
     }
@@ -524,7 +512,7 @@ ${allRiddlesSolved ?
                         <Brain size={16} className="text-purple-400 mr-2" />
                         <span className="text-white text-sm">ARIA - AI Guardian</span>
                         <div className="ml-4 flex items-center">
-                          {allRiddlesSolved ? 
+                          {allRiddlesSolved ?
                             <Unlock size={14} className="text-green-400 mr-1" /> :
                             <Lock size={14} className="text-red-400 mr-1" />
                           }
@@ -539,18 +527,16 @@ ${allRiddlesSolved ?
                         onClick={() => setActiveApp(null)}
                       />
                     </div>
-                    
+
                     <div className="flex-1 p-4 font-mono text-sm overflow-y-auto">
                       {aiChatHistory.map((entry, index) => (
                         <div key={index} className="mb-4">
-                          <div className={`inline-block max-w-3/4 p-3 rounded-lg ${
-                            entry.type === 'ai' 
-                              ? 'bg-purple-800 text-purple-100' 
+                          <div className={`inline-block max-w-3/4 p-3 rounded-lg ${entry.type === 'ai'
+                              ? 'bg-purple-800 text-purple-100'
                               : 'bg-blue-700 text-blue-100 ml-auto'
-                          }`}>
-                            <div className={`text-xs mb-1 ${
-                              entry.type === 'ai' ? 'text-purple-300' : 'text-blue-300'
                             }`}>
+                            <div className={`text-xs mb-1 ${entry.type === 'ai' ? 'text-purple-300' : 'text-blue-300'
+                              }`}>
                               {entry.type === 'ai' ? '🤖 ARIA' : '👤 You'}
                             </div>
                             {entry.content.split('\n').map((line, i) => (
@@ -560,7 +546,7 @@ ${allRiddlesSolved ?
                         </div>
                       ))}
                     </div>
-                    
+
                     <div className="border-t border-purple-700 p-3 flex gap-2">
                       <input
                         type="text"
@@ -605,8 +591,8 @@ ${allRiddlesSolved ?
                           key={index}
                           className={
                             entry.type === 'error' ? 'text-red-400' :
-                            entry.type === 'input' ? 'text-yellow-400' :
-                            'text-green-400'
+                              entry.type === 'input' ? 'text-yellow-400' :
+                                'text-green-400'
                           }
                         >
                           {entry.content.split('\n').map((line, i) => (
