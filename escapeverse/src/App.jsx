@@ -12,6 +12,7 @@ import Wall2 from './rooms/wall2';
 import Wall3 from './rooms/wall3';
 import Wall4 from './rooms/wall4';
 import CreateProfile from './CreateProfile';
+import CompletionScreen from './rooms/CompletionScreen';
 
 function App() {
   const { user, loading } = useUser();
@@ -80,7 +81,7 @@ function App() {
             } 
           />
           {/* game rooms */}
-          <Route path="/game/:roomId/tech" element={
+          <Route path="/game/:roomId/*" element={
             <GameProvider>
               <Wall1 />
             </GameProvider>
@@ -108,6 +109,7 @@ function App() {
               <Wall4 />
             </GameProvider>
           } />
+          <Route path="/completion" element={<CompletionScreen />} />
         </Routes>
       </div>
     </Router>

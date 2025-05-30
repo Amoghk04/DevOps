@@ -121,13 +121,21 @@ const Wall1 = () => {
     }
   ]);
 
-  // Add new state for opened wall areas near other area states
+  // Update your openedAreas state
   const [openedAreas] = useState([
     {
       id: 'door',
       coords: "511,127,834,129,831,854,511,848",
       onClick: () => {
-        console.log('Door is opened!');        
+        const startTime = parseInt(localStorage.getItem('gameStartTime'));
+        const endTime = Date.now();
+        const timeTaken = endTime - startTime;
+        
+        // Store the completion time for the CompletionScreen
+        localStorage.setItem('gameEndTime', endTime.toString());
+        localStorage.setItem('timeTaken', timeTaken.toString());
+        
+        navigate('/completion');
       }
     },
   ]);
