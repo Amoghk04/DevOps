@@ -24,6 +24,7 @@ export function GameProvider({ children }) {
   const [gatesSolved, setGatesSolved] = useState([false, false, false, false]);
   const [server2Code, setServer2Code] = useState('');
   const [wall3code, setWall3Code] = useState(''); // Assuming this is needed for Wall 3
+  const [wall4code, setWall4Code] = useState(''); // Assuming this is needed for Wall 4
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
@@ -214,6 +215,8 @@ export function GameProvider({ children }) {
     setHiddenTiles,
     wall3code,
     setWall3Code,
+    wall4code,  
+    setWall4Code,
     isWindowClosed,
     setIsWindowClosed,
     isBgmPlaying,

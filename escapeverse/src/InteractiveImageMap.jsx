@@ -300,20 +300,7 @@ const InteractiveImageMap = ({
         </svg>
       </div>
       
-      {/* Status indicator for debugging */}
-      {showDebug && (
-        <div className="absolute bottom-4 right-4 bg-black bg-opacity-70 text-white p-2 rounded text-sm">
-          {isFullscreen ? 'Fullscreen Mode' : 'Normal Mode'}
-          <br />
-          {hoveringAreaId ? `Hovering: ${hoveringAreaId}` : 'Not hovering'}
-          <br />
-          Areas: {scaledAreas.length}
-          <br />
-          Image: {imageNaturalDimensions.width} x {imageNaturalDimensions.height}
-          <br />
-          Aspect Ratio: {imageNaturalDimensions.width / imageNaturalDimensions.height}
-        </div>
-      )}
+      
     </div>
   );
 };

@@ -130,7 +130,7 @@ const Wall4 = () => {
                     <div className="absolute inset-0 flex items-center justify-center z-20">
                         <div className="bg-black bg-opacity-70 absolute inset-0" 
                              onClick={() => setShowPinInput(false)}></div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl relative z-30">
+                        <div className="bg-gray-800 dark:bg-gray-800 rounded-xl p-6 border-2 border-green-500 shadow-2xl relative z-30">
                             <button
                                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                                 onClick={() => setShowPinInput(false)}
@@ -140,7 +140,7 @@ const Wall4 = () => {
                                 </svg>
                             </button>
                             <div className="text-center">
-                                <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Enter Security Code</h3>
+                                <h3 className="text-xl font-bold mb-4 text-green-500 dark:text-green-500">Enter Security Code</h3>
                                 <input
                                     type="password"
                                     value={pinCode}
@@ -166,9 +166,9 @@ const Wall4 = () => {
                                             setPinCode('');
                                         }
                                     }}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                                    className="w-full bg-green-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
                                 >
-                                    Submit
+                                    Enter
                                 </button>
                             </div>
                         </div>
