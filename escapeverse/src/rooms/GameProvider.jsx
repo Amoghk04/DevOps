@@ -25,6 +25,7 @@ export function GameProvider({ children }) {
   const [server2Code, setServer2Code] = useState('');
   const [wall3code, setWall3Code] = useState(''); // Assuming this is needed for Wall 3
   const [wall4code, setWall4Code] = useState(''); // Assuming this is needed for Wall 4
+  const [isRoomOpened, setIsRoomOpened] = useState(false); // New state for wall opening
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
@@ -219,6 +220,8 @@ export function GameProvider({ children }) {
     setWall4Code,
     isWindowClosed,
     setIsWindowClosed,
+    isRoomOpened,
+    setIsRoomOpened,
     isBgmPlaying,
     playBackgroundMusic,
     playErrorSound,

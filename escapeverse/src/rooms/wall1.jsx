@@ -19,7 +19,9 @@ const Wall1 = () => {
     cornerLights,
     gatesSolved,
     updateCornerLight,
-    wall4code
+    wall4code,
+    isRoomOpened, 
+    setIsRoomOpened
   } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
@@ -117,6 +119,17 @@ const Wall1 = () => {
         // Now handled by GateComponent
       }
     }
+  ]);
+
+  // Add new state for opened wall areas near other area states
+  const [openedAreas] = useState([
+    {
+      id: 'door',
+      coords: "511,127,834,129,831,854,511,848",
+      onClick: () => {
+        console.log('Door is opened!');        
+      }
+    },
   ]);
 
   // Generate gate positions on component mount if they don't exist in context
@@ -290,7 +303,9 @@ const Wall1 = () => {
     console.log('PIN submitted:', pinCode);
     if (pinCode === wall4code) {
       console.log('Correct PIN!');
-      // Add successful PIN entry logic here
+      setIsRoomOpened(true);
+      setKeypadActivated(false); // Close the keypad
+      setPinCode(''); // Reset the pin code
     } else {
       console.log('Wrong PIN!');
       setPinCode('');
@@ -312,8 +327,8 @@ const Wall1 = () => {
     <div className="absolute inset-0 w-full h-full overflow-hidden">
       <div className="relative w-full h-full">
         <InteractiveImageMap
-          imageSrc="/wall-1.png"
-          areas={areas}
+          imageSrc={isRoomOpened ? "/wall-1-opened.png" : "/wall-1.png"} // Update image source based on wall state
+          areas={isRoomOpened ? openedAreas : areas}
           fullscreenOnMount={true}
           showDebug={true}
           className="w-full h-full object-cover"
@@ -534,7 +549,7 @@ const Wall1 = () => {
             Cancel
           </button>
         </div>
-      )}
+      )},
     </div>
   );
 };
