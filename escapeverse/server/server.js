@@ -176,6 +176,40 @@ app.post('/api/update-profile', async (req, res) => {
     }
 });
 
+app.post('/api/delete-account', async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Email is required' 
+            });
+        }
+
+        const result = await User.deleteOne({ email });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Account deleted successfully' 
+        });
+        
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173", // Change this to your frontend port if different

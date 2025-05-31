@@ -3,7 +3,7 @@ import { useUser } from "./UserContext";
 import { auth } from "./firebase";
 import { signOut } from "firebase/auth";
 import { useEffect, useState, useRef } from "react";
-import { Moon, Sun, LogOut, UserCircle2, Instagram, Menu, ChevronLeft, ChevronRight } from "lucide-react";
+import { Moon, Sun, LogOut, UserCircle2, Instagram, Menu, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProfileOverlay from "./ProfileOverlay";
 import SettingsOverlay from './SettingsOverlay';
@@ -109,7 +109,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className={`flex items-center gap-3 text-gray-600 dark:text-gray-300 ${!sidebarExpanded && 'justify-center'}`} onClick={() => setShowSettings(true)} style={{ cursor: 'pointer' }}>
-                  <Menu size={24} className="text-blue-500 dark:text-blue-400" />
+                  <Settings size={24} className="text-blue-500 dark:text-blue-400" />
                   {sidebarExpanded && <span className="font-medium">Settings</span>}
                 </div>
               </nav>
