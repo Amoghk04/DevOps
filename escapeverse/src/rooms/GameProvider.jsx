@@ -23,6 +23,11 @@ export function GameProvider({ children }) {
   const [cornerLights, setCornerLights] = useState([false, false, false, false]);
   const [gatesSolved, setGatesSolved] = useState([false, false, false, false]);
   const [server2Code, setServer2Code] = useState('');
+  const [wall3code, setWall3Code] = useState(''); // Assuming this is needed for Wall 3
+  const [wall4code, setWall4Code] = useState(''); // Assuming this is needed for Wall 4
+  const [isRoomOpened, setIsRoomOpened] = useState(false); // New state for wall opening
+  const [gameStartTime, setGameStartTime] = useState(null);
+  const [gameEndTime, setGameEndTime] = useState(null);
 
   const audioRef = useRef(null); // New ref for audio
   const errorAudioRef = useRef(null); // New ref for error sound
@@ -172,6 +177,10 @@ export function GameProvider({ children }) {
     }
   }, []);
 
+  useEffect(() => {
+    setGameStartTime(Date.now());
+  }, []);
+
   const updateGateSolved = (gateIndex) => {
     setGatesSolved(prev => {
       const newSolved = [...prev];
@@ -211,8 +220,14 @@ export function GameProvider({ children }) {
     setServerRoomKey,
     hiddenTiles,
     setHiddenTiles,
+    wall3code,
+    setWall3Code,
+    wall4code,  
+    setWall4Code,
     isWindowClosed,
     setIsWindowClosed,
+    isRoomOpened,
+    setIsRoomOpened,
     isBgmPlaying,
     playBackgroundMusic,
     playErrorSound,
@@ -228,7 +243,10 @@ export function GameProvider({ children }) {
     gatesSolved,
     updateGateSolved,
     server2Code,
-    setServer2Code
+    setServer2Code,
+    gameStartTime,
+    setGameEndTime,
+    gameEndTime
   };
 
   return (

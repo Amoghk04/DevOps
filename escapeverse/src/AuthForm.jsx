@@ -10,6 +10,42 @@ import googleLogo from "./assets/google.webp";
 import { useNavigate } from 'react-router-dom';
 import { socket } from './socket';
 
+const guestNames = [
+  "Buttercup",
+  "Supermario",
+  "Princess Peach",
+  "Kungfu Panda",
+  "Blade Manja",
+  "Ethan Hunt",
+  "Dissapointment",
+  "Baba Ramdev",
+  "Phil Dunphy",
+  "Carmey",
+];
+
+// Update the checkUserCredentials function
+const checkUserCredentials = async (email) => {
+  try {
+    const response = await fetch('http://localhost:3001/api/get-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error checking credentials:', error);
+    return { exists: false, message: 'Error checking credentials' };
+  }
+};
+
 export default function AuthForm() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -21,20 +57,39 @@ export default function AuthForm() {
     setError("");
 
     try {
+      // First check if user exists and get their details
+      const userDetails = await checkUserCredentials(email);
+      
+      if (!userDetails || !userDetails.exists) {
+        setError(userDetails?.message || "No account found with this email");
+        return;
+      }
 
-      // Handle Login
+      // Try to sign in with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // If login successful, set the user details in localStorage
+      localStorage.setItem("username", userDetails.username);
+      localStorage.setItem("profileIndex", userDetails.profileIndex);
+
       // Emit login event
       socket.emit("user-login", {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
-        displayName: userCredential.user.displayName
+        displayName: userDetails.username,
+        profileIndex: userDetails.profileIndex
       });
-      // Check if the user is new
+
       navigate('/home');
 
     } catch (err) {
-      setError(err.message);
+      if (err.code === 'auth/wrong-password') {
+        setError("Incorrect password");
+      } else if (err.code === 'auth/user-not-found') {
+        setError("No account found with this email");
+      } else {
+        setError(err.message);
+      }
     }
   };
 
@@ -46,17 +101,27 @@ export default function AuthForm() {
       });
 
       const result = await signInWithPopup(auth, provider);
-      // Emit login event with callback
-      socket.emit("user-login", {
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: result.user.displayName
-      });
+      
+      // Check if user exists in database
+      const userDetails = await checkUserCredentials(result.user.email);
+      
+      if (userDetails && userDetails.exists) {
+        // User exists in database, set their details to localStorage
+        localStorage.setItem("username", userDetails.username);
+        localStorage.setItem("profileIndex", userDetails.profileIndex);
 
-      if (result.additionalUserInfo.isNewUser) {
-        navigate('/create-profile');
-      } else {
+        // Emit login event with full details
+        socket.emit("user-login", {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: userDetails.username,
+          profileIndex: userDetails.profileIndex
+        });
+
         navigate('/home');
+      } else {
+        // New user, redirect to profile creation
+        navigate('/create-profile');
       }
     } catch (err) {
       setError(err.message);
@@ -65,18 +130,27 @@ export default function AuthForm() {
 
   const handleGuestAuth = async () => {
     try {
+      // Generate random name and profile index
+      const randomName = guestNames[Math.floor(Math.random() * guestNames.length)];
+      const randomProfileIndex = Math.floor(Math.random() * 9); // 0-8
+
+      // Set to localStorage
+      localStorage.setItem("username", randomName);
+      localStorage.setItem("profileIndex", randomProfileIndex.toString());
+
       const result = await signInAnonymously(auth);
-      // Emit login event for guest users with callback
-      socket.emit("user-login", {
-        uid: result.user.uid,
-        displayName: "Guest"
-      }, (response) => {
-        if (response.message === "User created successfully") {
-          navigate('/create-profile');
-        } else {
-          navigate('/home');
-        }
-      });
+      
+      // Guest user is not added to the database
+      // socket.emit("guest-login", {
+      //   uid: result.user.uid,
+      //   displayName: randomName,
+      //   profileIndex: randomProfileIndex,
+      //   isGuest: true
+      // });
+
+      // Navigate directly to home
+      navigate('/home');
+      
     } catch (err) {
       setError(err.message);
     }

@@ -8,6 +8,8 @@ export default function TileGrid() {
   const [userGuesses, setUserGuesses] = useState({});
   const [correctGuesses, setCorrectGuesses] = useState({});
   const {generatedPattern, setGeneratedPattern, hiddenTiles, setHiddenTiles} = useGame();
+  const [passcode, setPasscode] = useState('');
+  const {wall4code, setWall4Code} = useGame();
 
 
   // Generate logical sequence patterns for each row
@@ -192,6 +194,22 @@ export default function TileGrid() {
     setUserGuesses({});
     setCorrectGuesses({});
   }, [generatedPattern]);
+
+  // Add this useEffect after the tiles initialization useEffect
+  useEffect(() => {
+    if (tiles.length > 0 && hiddenTiles.length > 0) {
+      // Get all hidden numbers in order
+      const code = hiddenTiles
+        .map((positions, rowIndex) => 
+          positions.map(colIndex => tiles[rowIndex][colIndex]).join('')
+        )
+        .join('');
+      
+      setWall4Code(code);
+      setPasscode(code);
+      console.log('Hidden Tiles Passcode:', code);
+    }
+  }, [tiles, hiddenTiles]);
 
   // Reveal a pattern description
   const revealPattern = (rowIndex) => {

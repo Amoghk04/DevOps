@@ -99,6 +99,8 @@ function RoomLobby() {
     if (isHost) {
       socketRef.current.emit("start-game", { roomId, theme });
     }
+    localStorage.setItem('gameStartTime', Date.now().toString());
+
     //playBackgroundMusic(); // Play background music when starting the game
   };
 

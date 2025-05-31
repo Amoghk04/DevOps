@@ -4,7 +4,19 @@ import { motion } from "framer-motion";
 
 export default function ProfileOverlay({ onClose }) {
   const { user } = useUser();
-  motion;
+  const username = localStorage.getItem("username") || user?.displayName || "Anonymous";
+  const profileIndex = parseInt(localStorage.getItem("profileIndex") || "0");
+  const points = localStorage.getItem("points") || "0";
+
+  const getIconPosition = (index) => {
+    const row = Math.floor(index / 3);
+    const col = index % 3;
+    return {
+      x: `${col * 50}%`,
+      y: `${row * 50}%`
+    };
+  };
+
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
       <motion.div
@@ -12,7 +24,7 @@ export default function ProfileOverlay({ onClose }) {
         animate={{ rotateY: 0, opacity: 1 }}
         exit={{ rotateY: -90, opacity: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 12 }}
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md relative"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 w-full max-w-md relative"
         style={{ transformStyle: "preserve-3d" }}
       >
         <button 
@@ -21,19 +33,38 @@ export default function ProfileOverlay({ onClose }) {
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-blue-600 dark:text-blue-300">Your Profile</h2>
-        <div className="space-y-2">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Name</p>
-            <p className="text-lg font-semibold text-gray-800 dark:text-white">{user?.displayName || "Anonymous"}</p>
+
+        <div className="flex flex-col items-center mb-6">
+          {/* Profile Icon */}
+          <div className="w-64 h-64 rounded-full overflow-hidden relative mb-4">
+            <div
+              className="absolute w-full h-full bg-cover"
+              style={{
+                backgroundImage: "url('profile1.png')",
+                backgroundSize: "300% 300%",
+                backgroundPosition: `${getIconPosition(profileIndex).x} ${getIconPosition(profileIndex).y}`
+              }}
+              aria-label="Profile Icon"
+            />
           </div>
-          <div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Username</p>
+            <p className="text-lg font-semibold text-gray-800 dark:text-white">{username}</p>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
             <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-            <p className="text-lg font-semibold text-gray-800 dark:text-white">{user?.email || "No email"}</p>
-          </div>
-          <div>
+            <p className="text-lg font-semibold text-gray-800 dark:text-white">
+              {user?.email || "No email"}
+            </p>
+          </div>          
+
+          <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
             <p className="text-sm text-gray-500 dark:text-gray-400">User ID</p>
-            <p className="text-xs text-gray-600 break-all dark:text-gray-300">{user?.uid}</p>
+            <p className="text-xs font-mono text-gray-600 break-all dark:text-gray-300">{user?.uid}</p>
           </div>
         </div>
       </motion.div>

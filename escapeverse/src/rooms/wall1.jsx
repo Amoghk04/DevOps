@@ -9,7 +9,20 @@ const Wall1 = () => {
   const [keypadActivated, setKeypadActivated] = useState(false);
   const [pinCode, setPinCode] = useState('');
   const [showLeverMessage, setShowLeverMessage] = useState(false);
-  const { isDark, setIsDark, wall1GatePositions, setWall1GatePositions, lightCode, playLightOnSound, cornerLights, gatesSolved, updateCornerLight } = useGame();
+  const {
+    isDark,
+    setIsDark,
+    wall1GatePositions,
+    setWall1GatePositions,
+    lightCode,
+    playLightOnSound,
+    cornerLights,
+    gatesSolved,
+    updateCornerLight,
+    wall4code,
+    isRoomOpened, 
+    setIsRoomOpened
+  } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -57,7 +70,7 @@ const Wall1 = () => {
       id: 'keypad',
       coords: "1165,419,1272,419,1272,556,1167,556",
       onClick: () => {
-        console.log('Keypad clicked!');
+        console.log('Keypad clicked!' + wall4code);
         setKeypadActivated(true);
       }
     },
@@ -106,6 +119,25 @@ const Wall1 = () => {
         // Now handled by GateComponent
       }
     }
+  ]);
+
+  // Update your openedAreas state
+  const [openedAreas] = useState([
+    {
+      id: 'door',
+      coords: "511,127,834,129,831,854,511,848",
+      onClick: () => {
+        const startTime = parseInt(localStorage.getItem('gameStartTime'));
+        const endTime = Date.now();
+        const timeTaken = endTime - startTime;
+        
+        // Store the completion time for the CompletionScreen
+        localStorage.setItem('gameEndTime', endTime.toString());
+        localStorage.setItem('timeTaken', timeTaken.toString());
+        
+        navigate('/completion');
+      }
+    },
   ]);
 
   // Generate gate positions on component mount if they don't exist in context
@@ -258,9 +290,14 @@ const Wall1 = () => {
     };
   }, [showLeverMessage, keypadActivated, showInputOverlay]);
 
-  // Handle keypad input
+  // Add this near the top of the component to check wall4code length
+  useEffect(() => {
+    console.log('wall4code length:', wall4code?.length);
+  }, [wall4code]);
+
+  // Update the pin input handler to allow more digits
   const handlePinInput = (digit) => {
-    if (pinCode.length < 4) {
+    if (pinCode.length < (wall4code?.length || 6)) {
       setPinCode(prev => prev + digit);
     }
   };
@@ -269,12 +306,14 @@ const Wall1 = () => {
     setPinCode('');
   };
 
+  // Update the submit function to compare with wall4code
   const submitPin = () => {
     console.log('PIN submitted:', pinCode);
-    // Check if PIN is correct
-    if (pinCode === '1234') { // Replace with your desired PIN
+    if (pinCode === wall4code) {
       console.log('Correct PIN!');
-      // Add successful PIN entry logic here
+      setIsRoomOpened(true);
+      setKeypadActivated(false); // Close the keypad
+      setPinCode(''); // Reset the pin code
     } else {
       console.log('Wrong PIN!');
       setPinCode('');
@@ -296,8 +335,8 @@ const Wall1 = () => {
     <div className="absolute inset-0 w-full h-full overflow-hidden">
       <div className="relative w-full h-full">
         <InteractiveImageMap
-          imageSrc="/wall-1.png"
-          areas={areas}
+          imageSrc={isRoomOpened ? "/wall-1-opened.png" : "/wall-1.png"} // Update image source based on wall state
+          areas={isRoomOpened ? openedAreas : areas}
           fullscreenOnMount={true}
           showDebug={true}
           className="w-full h-full object-cover"
@@ -348,34 +387,34 @@ const Wall1 = () => {
         {isDark && (
           <>
             {/* Top Left Corner */}
-            <div 
+            <div
               className={`absolute top-8 left-8 w-6 h-6 rounded-full transition-all duration-500 z-20
-                ${cornerLights[0] 
-                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                ${cornerLights[0]
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]'
                   : 'bg-gray-800'}`}
             />
-            
+
             {/* Top Right Corner */}
-            <div 
+            <div
               className={`absolute top-8 right-8 w-6 h-6 rounded-full transition-all duration-500 z-20
-                ${cornerLights[1] 
-                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                ${cornerLights[1]
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]'
                   : 'bg-gray-800'}`}
             />
-            
+
             {/* Bottom Right Corner */}
-            <div 
+            <div
               className={`absolute bottom-8 right-8 w-6 h-6 rounded-full transition-all duration-500 z-20
-                ${cornerLights[3] 
-                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                ${cornerLights[3]
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]'
                   : 'bg-gray-800'}`}
             />
-            
+
             {/* Bottom Left Corner */}
-            <div 
+            <div
               className={`absolute bottom-8 left-8 w-6 h-6 rounded-full transition-all duration-500 z-20
-                ${cornerLights[2] 
-                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]' 
+                ${cornerLights[2]
+                  ? 'bg-lime-500 shadow-[0_0_20px_5px_rgba(132,204,22,0.5)]'
                   : 'bg-gray-800'}`}
             />
           </>
@@ -462,12 +501,26 @@ const Wall1 = () => {
         >
           <div className="text-center mb-4">
             <div className="text-blue-400 text-xl mb-2 font-mono tracking-wider uppercase">Security Code</div>
-            <div className="bg-gray-900 p-2 rounded flex justify-center">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="w-8 h-10 mx-1 border border-blue-500 rounded flex items-center justify-center text-xl text-blue-300 font-mono">
-                  {pinCode.length > i ? '•' : ''}
+            <div className="bg-gray-900 p-2 rounded flex flex-col items-center">
+              {/* First row - first 6 digits */}
+              <div className="flex justify-center mb-2">
+                {[...Array(Math.min(6, wall4code?.length || 6))].map((_, i) => (
+                  <div key={i} className="w-8 h-10 mx-1 border border-blue-500 rounded flex items-center justify-center text-xl text-blue-300 font-mono">
+                    {pinCode.length > i ? '•' : ''}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Second row - remaining digits if more than 6 */}
+              {(wall4code?.length > 6) && (
+                <div className="flex justify-center">
+                  {[...Array(wall4code.length - 6)].map((_, i) => (
+                    <div key={i + 6} className="w-8 h-10 mx-1 border border-blue-500 rounded flex items-center justify-center text-xl text-blue-300 font-mono">
+                      {pinCode.length > i + 6 ? '•' : ''}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -475,10 +528,13 @@ const Wall1 = () => {
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '✓'].map((btn) => (
               <button
                 key={btn}
-                className={`w-12 h-12 rounded-full font-mono 
-                  ${typeof btn === 'number' ? 'bg-gray-800 border border-blue-400' :
-                    (btn === 'C' ? 'bg-red-900 border border-red-500' : 'bg-green-900 border border-green-500')} 
-                  text-blue-300 text-xl flex items-center justify-center hover:opacity-80 active:opacity-60`}
+                className={`w-12 h-12 rounded-full font-mono text-xl flex items-center justify-center hover:opacity-80 active:opacity-60
+                  ${typeof btn === 'number' 
+                    ? 'bg-gray-800 text-blue-300 border border-blue-400' 
+                    : btn === 'C'
+                      ? 'bg-red-900 text-red-300 border border-red-500'
+                      : 'bg-green-900 text-green-300 border border-green-500'
+                  }`}
                 onClick={() => {
                   if (typeof btn === 'number') {
                     handlePinInput(btn);
@@ -501,7 +557,7 @@ const Wall1 = () => {
             Cancel
           </button>
         </div>
-      )}
+      )},
     </div>
   );
 };

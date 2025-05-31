@@ -1,17 +1,33 @@
-import { useState, useEffect,  } from 'react';
+import { useState, useEffect, } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 import googleLogo from "./assets/google.webp";
 import { auth } from "./firebase";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInAnonymously,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInAnonymously,
 } from "firebase/auth";
 import { socket } from './socket';
 import { useNavigate } from 'react-router-dom';
 
+const checkIfEmailExists = async (email) => {
+  try {
+    const response = await fetch('http://localhost:3001/api/check-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+    return data.exists;
+  } catch (error) {
+    console.error('Error checking email:', error);
+    return false;
+  }
+};
 
 export default function IconCarousel() {
     // Total number of icons in the 3x3 grid
@@ -77,11 +93,22 @@ export default function IconCarousel() {
         setError("");
 
         try {
+            // Check if email exists before creating account
+            const emailExists = await checkIfEmailExists(email);
+            if (emailExists) {
+              setError("An account with this email already exists");
+              return;
+            }
+
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            // Emit login event for new users
+            // Store both username and profile index
+            localStorage.setItem("username", username);
+            localStorage.setItem("profileIndex", currentIndex);
+            
             socket.emit("user-login", {
                 uid: userCredential.user.uid,
                 email: userCredential.user.email,
+                password: password,
                 displayName: username,
                 profileIndex: currentIndex,
             });
@@ -107,6 +134,8 @@ export default function IconCarousel() {
                 displayName: username,
                 profileIndex: currentIndex,
             });
+            localStorage.setItem("username", username);
+            localStorage.setItem("profileIndex", currentIndex);
 
             navigate('/home');
         } catch (err) {
@@ -116,14 +145,7 @@ export default function IconCarousel() {
 
     const handleGuestAuth = async () => {
         try {
-            const result = await signInAnonymously(auth);
-            // Emit login event for guest users
-            socket.emit("user-login", {
-                uid: result.user.uid,
-                displayName: username,
-                profileIndex: currentIndex,
-            });
-            navigate('/home');
+            navigate('/')
         } catch (err) {
             setError(err.message);
         }
@@ -233,7 +255,12 @@ export default function IconCarousel() {
                 onChange={handleConfirmPasswordChange}
                 className="w-full p-2 mb-4 rounded-md bg-white text-black"
             />
-            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong className="font-bold">Error: </strong>
+                    <span className="block sm:inline">{error}</span>
+                </div>
+            )}
 
             <button
                 onClick={handleAuth}
@@ -258,7 +285,7 @@ export default function IconCarousel() {
                     onClick={handleGuestAuth}
                     className="flex-1 py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition"
                 >
-                    Continue as Guest
+                    Go to Sign In
                 </button>
             </div>
 
