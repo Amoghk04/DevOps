@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { Moon, Sun, LogOut, UserCircle2, Instagram, Menu, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProfileOverlay from "./ProfileOverlay";
+import SettingsOverlay from './SettingsOverlay';
 
 export default function LandingPage() {
   const { user } = useUser();
@@ -13,6 +14,7 @@ export default function LandingPage() {
   const [points, setPoints] = useState(0);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const sidebarRef = useRef(null);
 
   const username = localStorage.getItem("username") || user?.displayName || user?.email || "Guest";
@@ -106,7 +108,7 @@ export default function LandingPage() {
                   </button>
                 </div>
 
-                <div className={`flex items-center gap-3 text-gray-600 dark:text-gray-300 ${!sidebarExpanded && 'justify-center'}`}>
+                <div className={`flex items-center gap-3 text-gray-600 dark:text-gray-300 ${!sidebarExpanded && 'justify-center'}`} onClick={() => setShowSettings(true)} style={{ cursor: 'pointer' }}>
                   <Menu size={24} className="text-blue-500 dark:text-blue-400" />
                   {sidebarExpanded && <span className="font-medium">Settings</span>}
                 </div>
@@ -210,6 +212,7 @@ export default function LandingPage() {
           </section>
         </main>
         {showProfile && <ProfileOverlay onClose={() => setShowProfile(false)} />}
+        {showSettings && <SettingsOverlay onClose={() => setShowSettings(false)} />}
       </div>
     </div>
   );

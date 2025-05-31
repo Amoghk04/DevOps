@@ -95,6 +95,87 @@ app.post('/api/get-user', async (req, res) => {
   }
 });
 
+app.post('/api/update-username', async (req, res) => {
+  try {
+    const { email, newUsername } = req.body;
+    
+    if (!email || !newUsername) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email and new username are required' 
+      });
+    }
+
+    console.log(`Attempting to update username for email: ${email} to ${newUsername}`);
+    
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      console.log(`No user found with email: ${email}`);
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+
+    user.displayName = newUsername;
+    await user.save();
+
+    console.log(`Username updated successfully for email: ${email}`);
+    res.json({ 
+      success: true, 
+      message: 'Username updated successfully' 
+    });
+    
+  } catch (error) {
+    console.error('Error updating username:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error',
+      error: error.message 
+    });
+  }
+});
+
+app.post('/api/update-profile', async (req, res) => {
+    try {
+        const { email, newUsername, newProfileIndex } = req.body;
+        
+        if (!email || !newUsername) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Email and new username are required' 
+            });
+        }
+
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
+        }
+
+        user.displayName = newUsername;
+        user.profileIndex = newProfileIndex;
+        await user.save();
+
+        res.json({ 
+            success: true, 
+            message: 'Profile updated successfully' 
+        });
+        
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error',
+            error: error.message 
+        });
+    }
+});
+
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173", // Change this to your frontend port if different
