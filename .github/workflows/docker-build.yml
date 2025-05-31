@@ -41,6 +41,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./escapeverse
-          file: .escapeverse/Dockerfile
+          file: ./escapeverse/Dockerfile
           push: true
           tags: amoghk04/ev-client:v2
