@@ -15,7 +15,7 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-const password = process.env.MONGO_PASS;
+const password = "7kyL0ZIOBr6Fx6TC";
 if (!password) {
   console.error('MongoDB password not found in environment variables');
   process.exit(1);
@@ -33,6 +33,7 @@ mongoose.connect(`mongodb+srv://devops:${password}@cluster0.w5ivypc.mongodb.net/
 const userSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
   email: String,
+  password: String, // Consider hashing passwords in production
   displayName: String,
   createdAt: Date,
   profileIndex: Number,
@@ -53,6 +54,47 @@ app.post('/api/create-user', async (req, res) => {
   }
 });
 
+// Add this endpoint after your other routes
+app.post('/api/check-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const existingUser = await User.findOne({ email });
+    res.json({ exists: !!existingUser });
+  } catch (error) {
+    console.error('Error checking email:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Add this new endpoint after your existing routes
+app.post('/api/get-user', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.json({ 
+        exists: false,
+        message: 'User not found' 
+      });
+    }
+
+    res.json({
+      exists: true,
+      username: user.displayName,
+      profileIndex: user.profileIndex,
+      message: 'User found'
+    });
+
+  } catch (error) {
+    console.error('Error getting user:', error);
+    res.status(500).json({ 
+      error: 'Server error',
+      message: error.message 
+    });
+  }
+});
+
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173", // Change this to your frontend port if different
@@ -68,7 +110,7 @@ const rooms = {};
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.on("user-login", async ({ uid, email, displayName, profileIndex }) => {
+  socket.on("user-login", async ({ uid, email, password, displayName, profileIndex }) => {
     try {
       // Check if the user already exists
       const existingUser = await User.findOne({ uid });
@@ -80,21 +122,19 @@ io.on("connection", (socket) => {
           uid,
           email,
           displayName: displayName || "New User",
+          password: password || "", 
           createdAt: new Date(),
           profileIndex,
         });
-        console.log(`Profile index ${profileIndex} for user ${uid}`);
+        console.log(`${password}--password`);
 
         await newUser.save();
         console.log(`New user saved to MongoDB: ${uid}`);
-        callback({ success: true, message: "User created successfully" });
       } else {
         console.log(`User already exists in MongoDB: ${uid}`);
-        callback({ success: true, message: "User exists" });
       }
     } catch (error) {
       console.error("Error saving user to MongoDB:", error);
-      callback({ success: false, error: error.message });
     }
   });
 

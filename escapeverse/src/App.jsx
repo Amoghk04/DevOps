@@ -71,14 +71,17 @@ function App() {
             element={<CreateProfile />}
           />
           <Route path="/create-room" element={<CreateRoom />} />
-          <Route path="/room/:roomId" element={<RoomLobby />} />
-          <Route 
-            path="/join-room" 
+          <Route path="/room/:roomId" element={
+            <div className="relative bg-black/60 rounded-xl shadow-2xl w-full max-w-md text-white ml-auto mr-100">
+            <RoomLobby />
+          </div>} />
+          <Route
+            path="/join-room"
             element={
               <div className="relative z-10 bg-black/60 p-8 rounded-xl shadow-2xl w-full max-w-md text-white ml-auto mr-10">
                 <JoinRoom />
               </div>
-            } 
+            }
           />
           {/* game rooms */}
           <Route path="/game/:roomId/*" element={
