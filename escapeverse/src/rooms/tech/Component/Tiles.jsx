@@ -10,6 +10,7 @@ export default function TileGrid() {
   const {generatedPattern, setGeneratedPattern, hiddenTiles, setHiddenTiles} = useGame();
   const [passcode, setPasscode] = useState('');
   const {wall4code, setWall4Code} = useGame();
+  const [isCompleted, setIsCompleted] = useState(false);
 
 
   // Generate logical sequence patterns for each row
@@ -211,6 +212,20 @@ export default function TileGrid() {
     }
   }, [tiles, hiddenTiles]);
 
+  // Check completion status
+  useEffect(() => {
+    if (tiles.length > 0 && hiddenTiles.length > 0) {
+      // Check if all hidden tiles have correct guesses
+      const allCorrect = hiddenTiles.every((positions, rowIndex) =>
+        positions.every(colIndex => {
+          const key = `${rowIndex}-${colIndex}`;
+          return correctGuesses[key];
+        })
+      );
+      setIsCompleted(allCorrect);
+    }
+  }, [correctGuesses, hiddenTiles, tiles]);
+
   // Reveal a pattern description
   const revealPattern = (rowIndex) => {
     setRevealedPatterns(prev => ({
@@ -345,6 +360,12 @@ export default function TileGrid() {
           </div>
         </div>
       ))}
+
+      {isCompleted && (
+        <div className="mt-6 p-4 bg-green-900/50 border border-green-500 rounded-lg text-green-400 font-mono text-lg animate-pulse">
+          🔓 Main Door Code Unlocked!
+        </div>
+      )}
 
       <div className="flex gap-4">
         <button
