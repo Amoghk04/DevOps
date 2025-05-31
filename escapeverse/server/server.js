@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import codeVerificationRouter from './routes/codeVerification.js';
 
 // Configure dotenv before using process.env
 dotenv.config({ path: './.env' })
@@ -12,8 +13,15 @@ const app = express();
 const server = http.createServer(app);
 const port = 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost", "http://localhost:80", "http://localhost:5173"],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 app.use(express.json());
+
+// Add code verification routes
+app.use('/api/code', codeVerificationRouter);
 
 const password = process.env.MONGO_PASS;
 if (!password) {
@@ -55,8 +63,9 @@ app.post('/api/create-user', async (req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Change this to your frontend port if different
-    methods: ["GET", "POST"]
+    origin: ["http://localhost", "http://localhost:80", "http://localhost:5173"],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 

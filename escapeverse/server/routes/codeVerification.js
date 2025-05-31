@@ -1,8 +1,15 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 router.post('/verify-code', async (req, res) => {
   const { challengeId } = req.body;
+
+  if (!challengeId || typeof challengeId !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Valid challenge ID is required'
+    });
+  }
 
   try {
     // Mock verification that always passes
@@ -23,6 +30,7 @@ router.post('/verify-code', async (req, res) => {
     res.json(mockResponse);
     
   } catch (error) {
+    console.error('Code verification error:', error);
     res.status(500).json({
       success: false,
       message: 'Error verifying code',
@@ -31,4 +39,4 @@ router.post('/verify-code', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
