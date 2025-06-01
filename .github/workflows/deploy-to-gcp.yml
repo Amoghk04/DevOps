@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the repo
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup SSH key
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.GCP_SSH_KEY }}" > ~/.ssh/gcp_key
@@ -23,6 +23,6 @@ jobs:
       - name: Pull latest code on GCP VM
         run: |
           ssh gcp-vm << 'EOF'
-            cd /home/dbproject1234567890/DevOps
+            cd /home/amogh/DevOps
             git pull origin main
           EOF
