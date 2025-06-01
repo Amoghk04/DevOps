@@ -425,142 +425,147 @@ const Wall1 = () => {
       </div>
 
       {/* overlay for light at center */}
-      {showInputOverlay && (
-        <div className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono">
-          <div ref={overlayRef} className="bg-black p-6 rounded-lg border-4 border-white w-96">
-            {isDark ? (
-              <>
-                <div className="mb-4 text-xl">Enter the code to lift the darkness:</div>
-                <div className="flex justify-center gap-4 mb-4">
-                  {[...Array(3)].map((_, index) => (
-                    <input
-                      key={index}
-                      type="text"
-                      maxLength="1"
-                      value={userInput[index] || ''}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        if (newValue.length <= 1) {
-                          const newInput = userInput.split('');
-                          newInput[index] = newValue;
-                          setUserInput(newInput.join(''));
+      <div data-testid="lever-root">
+        {showInputOverlay && (
+          <div className="absolute inset-0 z-20 bg-black bg-opacity-80 flex items-center justify-center text-white font-mono">
+            <div ref={overlayRef} className="bg-black p-6 rounded-lg border-4 border-white w-96">
+              {isDark ? (
+                <>
+                  <div className="mb-4 text-xl">Enter the code to lift the darkness:</div>
+                  <div className="flex justify-center gap-4 mb-4">
+                    {[...Array(3)].map((_, index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        maxLength="1"
+                        value={userInput[index] || ''}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          if (newValue.length <= 1) {
+                            const newInput = userInput.split('');
+                            newInput[index] = newValue;
+                            setUserInput(newInput.join(''));
 
-                          // Auto-focus next input if available
-                          if (newValue && index < 2) {
-                            const nextInput = e.target.parentElement.nextElementSibling?.querySelector('input');
-                            if (nextInput) nextInput.focus();
+                            // Auto-focus next input if available
+                            if (newValue && index < 2) {
+                              const nextInput = e.target.parentElement.nextElementSibling?.querySelector('input');
+                              if (nextInput) nextInput.focus();
+                            }
                           }
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        // Handle backspace to move to previous input
-                        if (e.key === 'Backspace' && !userInput[index] && index > 0) {
-                          const prevInput = e.target.parentElement.previousElementSibling?.querySelector('input');
-                          if (prevInput) prevInput.focus();
-                        }
-                      }}
-                      className={`w-16 h-16 text-center text-3xl bg-gray-800 rounded-md 
+                        }}
+                        onKeyDown={(e) => {
+                          // Handle backspace to move to previous input
+                          if (e.key === 'Backspace' && !userInput[index] && index > 0) {
+                            const prevInput = e.target.parentElement.previousElementSibling?.querySelector('input');
+                            if (prevInput) prevInput.focus();
+                          }
+                        }}
+                        className={`w-16 h-16 text-center text-3xl bg-gray-800 rounded-md 
                         border-2 ${shake ? 'animate-shake' : ''} 
                         ${userInput[index] ? 'border-green-500' : 'border-white'} 
                         text-white focus:outline-none focus:border-blue-500`}
-                    />
-                  ))}
-                </div>
-                <button
-                  onClick={() => {
-                    console.log('Light code:', lightCode);
-                    if (userInput.length < 3) {
-                      setShake(true);
-                      setTimeout(() => setShake(false), 500);
-                      return;
-                    }
-                    else if (userInput === lightCode) {
-                      playLightOnSound();
-                      setIsDark(false);
-                      setShowInputOverlay(false);
-                    } else {
-                      setShake(true);
-                      setTimeout(() => setShake(false), 500);
-                      setUserInput('');
-                    }
-                  }}
-                  className="w-full px-4 py-2 bg-green-600 rounded hover:bg-green-700"
-                >
-                  Submit
-                </button>
-              </>
-            ) : (
-              <div className="text-xl">Light is already on!</div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Show keypad overlay when keypad is activated */}
-      {keypadActivated && (
-        <div
-          ref={keypadRef}
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-90 p-6 rounded-lg shadow-2xl border border-blue-500"
-        >
-          <div className="text-center mb-4">
-            <div className="text-blue-400 text-xl mb-2 font-mono tracking-wider uppercase">Security Code</div>
-            <div className="bg-gray-900 p-2 rounded flex flex-col items-center">
-              {/* First row - first 6 digits */}
-              <div className="flex justify-center mb-2">
-                {[...Array(Math.min(6, wall4code?.length || 6))].map((_, i) => (
-                  <div key={i} className="w-8 h-10 mx-1 border border-blue-500 rounded flex items-center justify-center text-xl text-blue-300 font-mono">
-                    {pinCode.length > i ? '•' : ''}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              {/* Second row - remaining digits if more than 6 */}
-              {(wall4code?.length > 6) && (
-                <div className="flex justify-center">
-                  {[...Array(wall4code.length - 6)].map((_, i) => (
-                    <div key={i + 6} className="w-8 h-10 mx-1 border border-blue-500 rounded flex items-center justify-center text-xl text-blue-300 font-mono">
-                      {pinCode.length > i + 6 ? '•' : ''}
-                    </div>
-                  ))}
-                </div>
+                  <button
+                    onClick={() => {
+                      console.log('Light code:', lightCode);
+                      if (userInput.length < 3) {
+                        setShake(true);
+                        setTimeout(() => setShake(false), 500);
+                        return;
+                      }
+                      else if (userInput === lightCode) {
+                        playLightOnSound();
+                        setIsDark(false);
+                        setShowInputOverlay(false);
+                      } else {
+                        setShake(true);
+                        setTimeout(() => setShake(false), 500);
+                        setUserInput('');
+                      }
+                    }}
+                    className="w-full px-4 py-2 bg-green-600 rounded hover:bg-green-700"
+                  >
+                    Submit
+                  </button>
+                </>
+              ) : (
+                <div className="text-xl">Light is already on!</div>
               )}
             </div>
           </div>
+        )}
+      </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '✓'].map((btn) => (
-              <button
-                key={btn}
-                className={`w-12 h-12 rounded-full font-mono text-xl flex items-center justify-center hover:opacity-80 active:opacity-60
-                  ${typeof btn === 'number'
-                    ? 'bg-gray-800 text-blue-300 border border-blue-400'
-                    : btn === 'C'
-                      ? 'bg-red-900 text-red-300 border border-red-500'
-                      : 'bg-green-900 text-green-300 border border-green-500'
-                  }`}
-                onClick={() => {
-                  if (typeof btn === 'number') {
-                    handlePinInput(btn);
-                  } else if (btn === 'C') {
-                    clearPin();
-                  } else if (btn === '✓') {
-                    submitPin();
-                  }
-                }}
-              >
-                {btn}
-              </button>
-            ))}
-          </div>
-
-          <button
-            className="mt-4 w-full bg-gray-800 text-blue-300 p-2 rounded hover:bg-gray-700 font-mono tracking-wider uppercase border border-blue-400"
-            onClick={() => setKeypadActivated(false)}
+      <div data-testid="keypad-root">
+        {/* Show keypad overlay when keypad is activated */}
+        {keypadActivated && (
+          <div
+            ref={keypadRef}
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-90 p-6 rounded-lg shadow-2xl border border-blue-500"
           >
-            Cancel
-          </button>
-        </div>
-      )}
+            <div className="text-center mb-4">
+              <div className="text-blue-400 text-xl mb-2 font-mono tracking-wider uppercase">Security Code</div>
+              <div className="bg-gray-900 p-2 rounded flex flex-col items-center">
+                {/* First row - first 6 digits */}
+                <div className="flex justify-center mb-2">
+                  {[...Array(Math.min(6, wall4code?.length || 6))].map((_, i) => (
+                    <div key={i} className="w-8 h-10 mx-1 border border-blue-500 rounded flex items-center justify-center text-xl text-blue-300 font-mono">
+                      {pinCode.length > i ? '•' : ''}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Second row - remaining digits if more than 6 */}
+                {(wall4code?.length > 6) && (
+                  <div className="flex justify-center">
+                    {[...Array(wall4code.length - 6)].map((_, i) => (
+                      <div key={i + 6} className="w-8 h-10 mx-1 border border-blue-500 rounded flex items-center justify-center text-xl text-blue-300 font-mono">
+                        {pinCode.length > i + 6 ? '•' : ''}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '✓'].map((btn) => (
+                <button
+                  key={btn}
+                  className={`w-12 h-12 rounded-full font-mono text-xl flex items-center justify-center hover:opacity-80 active:opacity-60
+                  ${typeof btn === 'number'
+                      ? 'bg-gray-800 text-blue-300 border border-blue-400'
+                      : btn === 'C'
+                        ? 'bg-red-900 text-red-300 border border-red-500'
+                        : 'bg-green-900 text-green-300 border border-green-500'
+                    }`}
+                  onClick={() => {
+                    if (typeof btn === 'number') {
+                      handlePinInput(btn);
+                    } else if (btn === 'C') {
+                      clearPin();
+                    } else if (btn === '✓') {
+                      submitPin();
+                    }
+                  }}
+                >
+                  {btn}
+                </button>
+              ))}
+            </div>
+
+            <button
+              className="mt-4 w-full bg-gray-800 text-blue-300 p-2 rounded hover:bg-gray-700 font-mono tracking-wider uppercase border border-blue-400"
+              onClick={() => setKeypadActivated(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

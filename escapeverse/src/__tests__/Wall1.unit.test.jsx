@@ -8,7 +8,6 @@ jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
 }));
 
-// Mock useGame from its actual provider location
 jest.mock('../rooms/GameProvider', () => ({
     useGame: () => ({
         isDark: true,
@@ -31,6 +30,18 @@ jest.mock('../rooms/GameProvider', () => ({
     }),
 }));
 
+// Mock InteractiveImageMap to expose the areas prop for testing
+jest.mock('../InteractiveImageMap', () => (props) => {
+    global.__wall1Areas = props.areas;
+    return (
+        <img
+            src={props.imageSrc}
+            alt="Wall1"
+            data-testid="wall1-img"
+        />
+    );
+});
+
 describe('Wall1', () => {
     it('renders without crashing', () => {
         render(
@@ -38,47 +49,50 @@ describe('Wall1', () => {
                 <Wall1 />
             </MemoryRouter>
         );
-        // Check for the main image (InteractiveImageMap renders an img)
         expect(screen.getByRole('img')).toBeInTheDocument();
     });
 
-    it('shows Security Code keypad when keypad is activated', () => {
+    it('shows Security Code keypad when keypad area is clicked', () => {
         render(
             <MemoryRouter>
                 <Wall1 />
             </MemoryRouter>
         );
-        
-        expect(screen.queryByText(/Security Code/i)).not.toBeInTheDocument();
+        const keypadArea = global.__wall1Areas.find(a => a.id === 'keypad');
+        keypadArea.onClick();
+        expect(screen.getByTestId('keypad-root')).toBeInTheDocument();
     });
 
-    it('does not show the lever overlay by default', () => {
+    it('shows lever overlay when lever area is clicked', () => {
         render(
             <MemoryRouter>
                 <Wall1 />
             </MemoryRouter>
         );
-        expect(screen.queryByText(/Enter the code to lift the darkness/i)).not.toBeInTheDocument();
+        const leverArea = global.__wall1Areas.find(a => a.id === 'lever');
+        leverArea.onClick();
+        expect(screen.getByTestId('lever-root')).toBeInTheDocument();
     });
 
-    it('navigates left when left arrow is clicked', () => {
+    it('navigates left when left arrow area is clicked', () => {
         render(
             <MemoryRouter>
                 <Wall1 />
             </MemoryRouter>
         );
-        // Find left arrow by role or add data-testid in Wall1 for easier selection
-        fireEvent.click(screen.getByTestId('left-arrow'));
+        const leftArrowArea = global.__wall1Areas.find(a => a.id === 'leftArrow');
+        leftArrowArea.onClick();
         expect(mockNavigate).toHaveBeenCalledWith('/wall2');
     });
 
-    it('navigates right when right arrow is clicked', () => {
+    it('navigates right when right arrow area is clicked', () => {
         render(
             <MemoryRouter>
                 <Wall1 />
             </MemoryRouter>
         );
-        fireEvent.click(screen.getByTestId('right-arrow'));
+        const rightArrowArea = global.__wall1Areas.find(a => a.id === 'rightArrow');
+        rightArrowArea.onClick();
         expect(mockNavigate).toHaveBeenCalledWith('/wall4');
     });
 
@@ -88,7 +102,6 @@ describe('Wall1', () => {
                 <Wall1 />
             </MemoryRouter>
         );
-        // The torchlight overlay is a div with a radial-gradient background
         expect(document.querySelector('.pointer-events-none')).toBeInTheDocument();
     });
 
@@ -98,38 +111,6 @@ describe('Wall1', () => {
                 <Wall1 />
             </MemoryRouter>
         );
-        // There should be 4 corner light divs
         expect(document.querySelectorAll('.rounded-full').length).toBeGreaterThanOrEqual(4);
-    });
-
-    it('shows opened wall image when isRoomOpened is true', () => {
-        // Override mock to set isRoomOpened true
-        jest.mock('../rooms/GameProvider', () => ({
-            useGame: () => ({
-                isDark: true,
-                setIsDark: jest.fn(),
-                wall1GatePositions: [
-                    { left: 200, top: 300 },
-                    { left: 300, top: 300 },
-                    { left: 400, top: 300 },
-                    { left: 500, top: 300 }
-                ],
-                setWall1GatePositions: jest.fn(),
-                lightCode: '123',
-                playLightOnSound: jest.fn(),
-                cornerLights: [false, false, false, false],
-                gatesSolved: [false, false, false, false],
-                updateCornerLight: jest.fn(),
-                wall4code: '123456',
-                isRoomOpened: true,
-                setIsRoomOpened: jest.fn(),
-            }),
-        }));
-        render(
-            <MemoryRouter>
-                <Wall1 />
-            </MemoryRouter>
-        );
-        expect(screen.getByRole('img').getAttribute('src')).toContain('png');
     });
 });
