@@ -9,10 +9,11 @@ import {
 } from "firebase/auth";
 import { socket } from './socket';
 import { useNavigate } from 'react-router-dom';
+import config from './config';
 
 const checkIfEmailExists = async (email) => {
   try {
-    const response = await fetch('http://localhost:3001/api/check-email', {
+    const response = await fetch(`${config.apiUrl}:3001/api/check-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

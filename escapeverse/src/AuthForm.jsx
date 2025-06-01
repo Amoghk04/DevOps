@@ -9,6 +9,7 @@ import {
 import googleLogo from "./assets/google.webp";
 import { useNavigate } from 'react-router-dom';
 import { socket } from './socket';
+import config from './config';
 
 const guestNames = [
   "Buttercup",
@@ -26,7 +27,7 @@ const guestNames = [
 // Update the checkUserCredentials function
 const checkUserCredentials = async (email) => {
   try {
-    const response = await fetch('http://localhost:3001/api/get-user', {
+    const response = await fetch(`${config.apiUrl}:3001/api/get-user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,14 +1,16 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
+import config from '../src/config.js';
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Change this to your frontend port if different
-    methods: ["GET", "POST"]
+    origin: `${config.apiUrl}:5173`,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -131,7 +133,7 @@ app.get("/", (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3002;
+const PORT = 3002;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -1,6 +1,12 @@
 import { io } from "socket.io-client";
+import config from './config';
 
-export const socket = io("http://localhost:3001");
+const socketURL = `${config.apiUrl}:${config.serverPort}`;
+
+export const socket = io(socketURL, {
+  reconnectionDelayMax: 10000,
+  reconnectionAttempts: 5
+});
 
 socket.on("connect", () => {
   console.log("Connected to server with ID:", socket.id);

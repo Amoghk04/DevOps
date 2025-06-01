@@ -12,6 +12,7 @@ metadata:
       add_header Pragma "no-cache";
       add_header Expires "0";
 spec:
+  ingressClassName: "gce"  # ✅ Replace annotation with this
   rules:
   - host: localhost
     http:

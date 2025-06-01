@@ -2,6 +2,7 @@ import { X, ChevronLeft, ChevronRight, Edit2, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useUser } from "./UserContext";
 import { auth } from "./firebase"; // Add this import at the top
+import config from './config';
 
 const SettingsOverlay = ({ onClose }) => {
     const [username, setUsername] = useState(localStorage.getItem('username') || '');
@@ -48,7 +49,7 @@ const SettingsOverlay = ({ onClose }) => {
 
     const handleProfileUpdate = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/update-profile', {
+            const response = await fetch(`${config.apiUrl}:3001/api/update-profile`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ const SettingsOverlay = ({ onClose }) => {
     const handleDeleteAccount = async () => {
         if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
             try {
-                const response = await fetch('http://localhost:3001/api/delete-account', {
+                const response = await fetch(`${config.apiUrl}:3001/api/delete-account`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

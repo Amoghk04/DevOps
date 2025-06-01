@@ -1,7 +1,8 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { UserContext } from "./UserContext"; // Import your UserContext
+import { UserContext } from "./UserContext";
+import config from "./config"; // Import your UserContext
 
 function RoomLobby() {
   const { roomId } = useParams();
@@ -23,7 +24,7 @@ function RoomLobby() {
     console.log("Local storage room ID:", localStorage.getItem("roomHostId"));
 
     // Create socket connection inside the component
-    socketRef.current = io("http://localhost:3001");
+    socketRef.current = io(`${config.apiUrl}:${config.serverPort}`);
 
     // Set up event listeners first before joining
     socketRef.current.on("room-players", (data) => {
