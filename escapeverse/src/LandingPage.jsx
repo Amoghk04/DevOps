@@ -11,7 +11,6 @@ import SettingsOverlay from './SettingsOverlay';
 export default function LandingPage() {
   const { user } = useUser();
   const [dark, setDark] = useState(false);
-  const [points, setPoints] = useState(0);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -24,24 +23,6 @@ export default function LandingPage() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
-
-  // Fetch user points from backend (Flask & MongoDB)
-  // Fetch user points from backend (Flask & MongoDB)
-  useEffect(() => {
-    const fetchUserPoints = async () => {
-      if (!user?.uid) return;
-
-      try {
-        const response = await fetch(`/api/get_user_points?uid=${user.uid}`);
-        const data = await response.json();
-        setPoints(data.points || 0);
-      } catch (err) {
-        console.error("Failed to fetch points:", err);
-      }
-    };
-
-    fetchUserPoints();
-  }, [user]);
 
   const handleSignOut = async () => {
     await signOut(auth);

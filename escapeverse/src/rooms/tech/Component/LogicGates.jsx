@@ -363,31 +363,6 @@ export default function LogicGatePuzzle({ circuit: providedCircuit, gateNumber }
         }
     }, [userOutputs, circuit, gateActiveStates, gateNumber]);
 
-    // Function to generate wall1_code from all gate outputs
-    const generateWallCode = () => {
-        // Get all the active gate numbers (sorted to ensure consistent order)
-        const activeGateNumbers = Object.keys(gateActiveStates || {})
-            .filter(gate => gateActiveStates[gate])
-            .sort();
-
-        // Combine all outputs from active gates into a single string
-        let code = '';
-        activeGateNumbers.forEach(gate => {
-            const outputs = gateOutputStates[gate];
-            if (outputs) {
-                // Convert outputs to binary digits and append to code
-                outputs.forEach(output => {
-                    // Only include 0 and 1 values, skip any -1 (unselected)
-                    if (output !== -1) {
-                        code += output;
-                    }
-                });
-            }
-        });
-
-        return code;
-    };
-
     const checkAnswer = () => {
         if (circuit && !gateActiveStates?.[gateNumber]) {
             const isCorrect = userOutputs.every((output, index) => output === circuit.outputs[index]);

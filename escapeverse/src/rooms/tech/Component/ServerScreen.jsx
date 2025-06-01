@@ -3,7 +3,7 @@ import { Terminal, XCircle, Code, Send, AlertCircle } from 'lucide-react';
 import { debuggingChallenges } from './debuggingChallenges';
 import { useGame } from '../../GameProvider';
 
-const ServerScreen = ({ isOpen, onClose, isSecondServer = false }) => {
+const ServerScreen = ({ isOpen, onClose,  }) => {
   const [terminalHistory, setTerminalHistory] = useState([
     { type: 'system', content: 'Server Terminal v1.0\nType "help" for available commands.' }
   ]);
@@ -15,8 +15,8 @@ const ServerScreen = ({ isOpen, onClose, isSecondServer = false }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [accessCode, setAccessCode] = useState('');
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
-  const [completionCode, setCompletionCode] = useState('');
+  // const [showCompletionModal, setShowCompletionModal] = useState(false);
+  // const [completionCode, setCompletionCode] = useState('');
   const [challengesCompleted, setChallengesCompleted] = useState(false);
   const { setServer2Code } = useGame();
 accessCode;

@@ -6,8 +6,6 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
   const [activeGate, setActiveGate] = useState(null);
   const gateOverlayRef = useRef(null);
   const { 
-    gateOutputStates, 
-    saveGateOutputs, 
     playGateSolveSound,
     updateGateSolved,
     getOrCreateCircuit 
@@ -38,12 +36,6 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [activeGate]);
-
-  const handleGateSuccess = (gateNumber) => {
-    playGateSolveSound();
-    // Convert gate number to 0-based index
-    updateGateSolved(gateNumber - 1);
-  };
 
   return (
     <>

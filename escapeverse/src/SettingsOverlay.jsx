@@ -1,7 +1,6 @@
 import { X, ChevronLeft, ChevronRight, Edit2, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useUser } from "./UserContext";
-import { useNavigate } from 'react-router-dom';
 import { auth } from "./firebase"; // Add this import at the top
 
 const SettingsOverlay = ({ onClose }) => {
@@ -11,7 +10,6 @@ const SettingsOverlay = ({ onClose }) => {
     const [error, setError] = useState('');
     const { user } = useUser();
     const [currentIndex, setCurrentIndex] = useState(parseInt(localStorage.getItem('profileIndex')) || 0);
-    const navigate = useNavigate();
 
     // Profile carousel constants
     const totalIcons = 9;

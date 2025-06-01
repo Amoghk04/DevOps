@@ -6,7 +6,6 @@ export default function ProfileOverlay({ onClose }) {
   const { user } = useUser();
   const username = localStorage.getItem("username") || user?.displayName || "Anonymous";
   const profileIndex = parseInt(localStorage.getItem("profileIndex") || "0");
-  const points = localStorage.getItem("points") || "0";
 
   const getIconPosition = (index) => {
     const row = Math.floor(index / 3);

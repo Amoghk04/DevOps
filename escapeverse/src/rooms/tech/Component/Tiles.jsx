@@ -8,8 +8,8 @@ export default function TileGrid() {
   const [userGuesses, setUserGuesses] = useState({});
   const [correctGuesses, setCorrectGuesses] = useState({});
   const {generatedPattern, setGeneratedPattern, hiddenTiles, setHiddenTiles} = useGame();
-  const [passcode, setPasscode] = useState('');
-  const {wall4code, setWall4Code} = useGame();
+  const [, setPasscode] = useState('');
+  const {setWall4Code} = useGame();
   const [isCompleted, setIsCompleted] = useState(false);
 
 

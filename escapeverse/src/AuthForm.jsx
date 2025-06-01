@@ -139,7 +139,7 @@ export default function AuthForm() {
       localStorage.setItem("profileIndex", randomProfileIndex.toString());
 
       const result = await signInAnonymously(auth);
-      
+      console.log("result", result);
       // Guest user is not added to the database
       // socket.emit("guest-login", {
       //   uid: result.user.uid,

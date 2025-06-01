@@ -4,14 +4,12 @@ const InteractiveImageMap = ({
   imageSrc, 
   areas = [],
   fullscreenOnMount = false,
-  showDebug = false,
   className = "w-screen h-screen relative overflow-hidden",
   containerClassName = "w-screen h-screen fixed top-0 left-0",
   hoverBorderColor = "rgba(255, 204, 0, 0.8)",
   hoverBorderWidth = "3px",
-  aspectRatio = null // Optional explicit aspect ratio (e.g. "16/9")
 }) => {
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [, setIsFullscreen] = useState(false);
   const [hoveringAreaId, setHoveringAreaId] = useState(null);
   const [imageNaturalDimensions, setImageNaturalDimensions] = useState({ width: 0, height: 0 });
   const [imgLoaded, setImgLoaded] = useState(false);

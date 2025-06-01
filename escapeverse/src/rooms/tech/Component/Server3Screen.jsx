@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Terminal, XCircle, Power, Folder, Monitor, FileText, Bot, Brain, Lock, Unlock } from 'lucide-react';
 import { useGame } from '../../GameProvider';
-import { set } from 'mongoose';
 
-const Server3Screen = ({ isOpen, onClose }) => {
+const Server3Screen = ({ onClose }) => {
   const [isLocked, setIsLocked] = useState(true);
   const [isOn, setIsOn] = useState(false);
   const [lockScreenInput, setLockScreenInput] = useState('');
@@ -29,7 +28,7 @@ const Server3Screen = ({ isOpen, onClose }) => {
   const [aiPersonality, setAiPersonality] = useState('neutral'); // neutral, friendly, sassy, helpful
   const [attempts, setAttempts] = useState(0);
   const [hiddenKeywords] = useState(['entropy', 'cipher', 'quantum', 'nexus']);
-  const { server2Code, wall3ode, setWall3Code } = useGame();
+  const { server2Code, wall3code, setWall3Code } = useGame();
 
   // Riddle database
   const riddles = [
@@ -397,6 +396,7 @@ ${allRiddlesSolved ?
       };
       if (allRiddlesSolved) {
         setWall3Code(finalCode);
+        console.log("Final access code set:", wall3code);
       }
     } else if (command === 'clear') {
       setTerminalHistory([]);

@@ -8,7 +8,7 @@ const Wall4 = () => {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const { isDark, isWindowClosed, setIsWindowClosed, wall3code } = useGame();
-    const [currentImage, setCurrentImage] = useState("/wall4-closed.png");
+    //const [currentImage, setCurrentImage] = useState("/wall4-closed.png");
     const [showTileGrid, setShowTileGrid] = useState(false); // State to control tile grid visibility
     const [pinCode, setPinCode] = useState('');
     const [showPinInput, setShowPinInput] = useState(false);

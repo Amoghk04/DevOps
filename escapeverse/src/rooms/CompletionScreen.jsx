@@ -4,15 +4,20 @@ import { useNavigate } from 'react-router-dom';
 const CompletionScreen = () => {
   const [elapsedTime, setElapsedTime] = useState('');
   const [showContent, setShowContent] = useState(false);
+  const [username, setUsername] = useState(''); // Add this state
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timeTaken = parseInt(localStorage.getItem('timeTaken')); 
+    const timeTaken = parseInt(localStorage.getItem('timeTaken'));
     const totalSeconds = Math.floor(timeTaken / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
     setElapsedTime(`${hours}h ${minutes}m ${seconds}s`);
+    
+    // Get username from localStorage
+    const storedUsername = localStorage.getItem('username') || 'Player';
+    setUsername(storedUsername);
 
     // Animate content appearance
     const timer = setTimeout(() => {
@@ -64,9 +69,9 @@ const CompletionScreen = () => {
 
       {/* Main content */}
       <div className={`relative z-10 text-center max-w-2xl mx-auto px-6 transition-all duration-1000 transform ${showContent ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-        
+
         {/* Trophy icon */}
-          <div className="text-8xl mb-2">🏆</div>
+        <div className="text-8xl mb-2">🏆</div>
 
         {/* Main heading */}
         <h1 className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 font-mono mb-6 animate-pulse">
@@ -76,7 +81,7 @@ const CompletionScreen = () => {
         {/* Success message */}
         <div className="mb-8">
           <p className="text-2xl md:text-3xl text-green-400 font-mono mb-4 animate-fade-in">
-            🎉 Congratulations, Agent! 🎉
+            🎉 Congratulations, {username}!
           </p>
           <p className="text-xl text-gray-300 font-mono leading-relaxed">
             You've successfully navigated through all challenges<br />
@@ -101,10 +106,10 @@ const CompletionScreen = () => {
           >
             Return to Home
           </button>
-          
+
         </div>
 
-        
+
       </div>
 
     </div>

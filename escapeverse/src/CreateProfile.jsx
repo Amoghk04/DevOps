@@ -1,13 +1,11 @@
-import { useState, useEffect, } from 'react';
+import { useState, } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 import googleLogo from "./assets/google.webp";
 import { auth } from "./firebase";
 import {
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
     GoogleAuthProvider,
     signInWithPopup,
-    signInAnonymously,
 } from "firebase/auth";
 import { socket } from './socket';
 import { useNavigate } from 'react-router-dom';
