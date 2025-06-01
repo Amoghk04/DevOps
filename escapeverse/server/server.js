@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import codeVerificationRouter from './routes/codeVerification.js';
-import config from '../src/config.js';
+
 
 // Configure dotenv before using process.env
 dotenv.config({ path: './.env' })
@@ -14,14 +14,8 @@ const app = express();
 const server = http.createServer(app);
 const port = 3001;
 
-const allowedOrigins = [
-  `${config.apiUrl}`,
-  `${config.apiUrl}:80`,
-  `${config.apiUrl}:5173`
-];
-
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "*",
   methods: ["GET", "POST"],
   credentials: true
 }));
@@ -227,7 +221,7 @@ app.post('/api/delete-account', async (req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true
   }
