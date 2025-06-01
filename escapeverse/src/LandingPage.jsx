@@ -124,7 +124,11 @@ export default function LandingPage() {
           {/* Header */}
           <header className="flex justify-between items-center mb-10 p-5 bg-white/10 dark:bg-gray-800/10 backdrop-blur-md rounded-2xl shadow-lg">
             <div className="flex items-center gap-4">
-              <div className="w-32 h-32 rounded-full overflow-hidden relative">
+              <div 
+                className="w-32 h-32 rounded-full overflow-hidden relative"
+                role="img"
+                aria-label={`${username}'s profile picture`}
+              >
                 <div
                   className="absolute w-full h-full bg-cover"
                   style={{
@@ -132,7 +136,6 @@ export default function LandingPage() {
                     backgroundSize: "300% 300%",
                     backgroundPosition: `${getIconPosition(profileIndex).x} ${getIconPosition(profileIndex).y}`
                   }}
-                  aria-label="Profile Icon"
                 />
               </div>
               <div>

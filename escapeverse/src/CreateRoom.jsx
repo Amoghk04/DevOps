@@ -66,19 +66,27 @@ function CreateRoom() {
                 {themes.map((theme, idx) => (
                     <div
                         key={idx}
+                        role="group"
+                        aria-labelledby={`theme-title-${idx}`}
                         className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-8 rounded-3xl shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-[0_0_35px_rgba(56,189,248,0.6)] ${theme.darkShadow} group`}
                     >
                         <h2
+                            id={`theme-title-${idx}`}
                             className={`text-2xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r ${theme.gradient}`}
                         >
                             {theme.name}
                         </h2>
-                        <p className="text-gray-700 dark:text-gray-300 mb-6 group-hover:text-blue-900 dark:group-hover:text-blue-300 transition-colors duration-300">
+                        <p 
+                            id={`theme-desc-${idx}`}
+                            className="text-gray-700 dark:text-gray-300 mb-6 group-hover:text-blue-900 dark:group-hover:text-blue-300 transition-colors duration-300"
+                        >
                             {theme.description}
                         </p>
                         <button
                             onClick={() => handleStartRoom(theme.key)}
                             className={`block w-full p-4 bg-gradient-to-r ${theme.gradient} hover:brightness-110 rounded-xl text-white text-center font-semibold shadow-md transition-all duration-300`}
+                            aria-label={`Create Room`}
+                            aria-describedby={`theme-desc-${idx}`}
                         >
                             Create Room
                         </button>

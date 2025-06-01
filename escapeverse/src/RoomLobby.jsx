@@ -118,13 +118,36 @@ function RoomLobby() {
       <h2 className="text-xl mb-2">Theme: {theme}</h2>
 
       {/* Display room code for sharing */}
-      <div className="mb-6 text-center">
-        <h3 className="text-xl font-semibold">Room Code:</h3>
-        <p className="text-2xl font-mono bg-gray-800 px-4 py-2 rounded">{roomId}</p>
-        <p className="text-sm mt-2">Share this code with friends to join!</p>
+      <div 
+        className="mb-6 text-center"
+        role="region"
+        aria-labelledby="room-code-heading"
+      >
+        <h3 
+          id="room-code-heading"
+          className="text-xl font-semibold"
+        >
+          Room Code:
+        </h3>
+        <p 
+          className="text-2xl font-mono bg-gray-800 px-4 py-2 rounded"
+          data-testid="room-code"
+          role="status"
+          aria-live="polite"
+        >
+          {roomId}
+        </p>
+        <p 
+          className="text-sm mt-2"
+          id="room-code-helper"
+        >
+          Share this code with friends to join!
+        </p>
         <button
           onClick={copyRoomCode}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+          aria-label="Copy room code to clipboard"
+          aria-describedby="room-code-helper"
         >
           Copy Room Code
         </button>
