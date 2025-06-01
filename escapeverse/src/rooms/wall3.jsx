@@ -77,32 +77,37 @@ const Wall3 = () => {
                     showDebug={true}
                     className="w-full h-full object-cover"
                 />
-                
+
                 <CodePrompt
                     isOpen={showCodePrompt}
                     onClose={() => setShowCodePrompt(false)}
                     onSubmit={handleCodeSuccess}
                     correctCode={serverRoomKey}
                 />
-                
-                {showServer1Screen && (
-                    <ErrorBoundary onReset={() => setShowServer1Screen(false)}>
-                        <ServerScreen
-                            isOpen={true}
-                            onClose={() => setShowServer1Screen(false)}
-                        />
-                    </ErrorBoundary>
-                )}
 
-                {showServer2Screen && (
-                    <ErrorBoundary onReset={() => setShowServer2Screen(false)}>
-                        <Server2Screen
-                            isOpen={true}
-                            onClose={() => setShowServer2Screen(false)}
-                        />
-                    </ErrorBoundary>
-                )}
+                <div data-testid="server1-screen-root">
+                    {showServer1Screen && (
+                        <ErrorBoundary onReset={() => setShowServer1Screen(false)}>
+                            <ServerScreen
+                                isOpen={true}
+                                onClose={() => setShowServer1Screen(false)}
+                            />
+                        </ErrorBoundary>
+                    )}
+                </div>
 
+                <div data-testid="server2-screen-root">
+                    {showServer2Screen && (
+                        <ErrorBoundary onReset={() => setShowServer2Screen(false)}>
+                            <Server2Screen
+                                isOpen={true}
+                                onClose={() => setShowServer2Screen(false)}
+                            />
+                        </ErrorBoundary>
+                    )}
+                </div>
+
+                <div data-testid="server3-screen-root">
                 {showServer3Screen && (
                     <ErrorBoundary onReset={() => setShowServer3Screen(false)}>
                         <Server3Screen
@@ -111,10 +116,12 @@ const Wall3 = () => {
                         />
                     </ErrorBoundary>
                 )}
+                </div>
 
                 {/* Right Arrow Navigation Indicator */}
                 <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
                     <div
+                        data-testid="left-arrow"
                         className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
                         onClick={() => navigate('/wall4')}
                     >
@@ -126,6 +133,7 @@ const Wall3 = () => {
 
                 <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
                     <div
+                        data-testid="right-arrow"
                         className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
                         onClick={() => navigate('/wall2')} // Navigate back to the center wall
                     >

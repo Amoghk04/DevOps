@@ -20,7 +20,7 @@ const Wall1 = () => {
     gatesSolved,
     updateCornerLight,
     wall4code,
-    isRoomOpened, 
+    isRoomOpened,
     setIsRoomOpened
   } = useGame();
   const [showInputOverlay, setShowInputOverlay] = useState(false);
@@ -56,6 +56,7 @@ const Wall1 = () => {
   const [areas, setAreas] = useState([
     {
       id: 'lever',
+      'data-testid': 'lever-area',
       coords: "622,271,686,271,684,461,671,466,667,490,595,492,579,488,581,468,588,448,603,441,623,436,623,359",
       onClick: () => {
         console.log('Lever clicked!');
@@ -130,11 +131,11 @@ const Wall1 = () => {
         const startTime = parseInt(localStorage.getItem('gameStartTime'));
         const endTime = Date.now();
         const timeTaken = endTime - startTime;
-        
+
         // Store the completion time for the CompletionScreen
         localStorage.setItem('gameEndTime', endTime.toString());
         localStorage.setItem('timeTaken', timeTaken.toString());
-        
+
         navigate('/completion');
       }
     },
@@ -352,6 +353,7 @@ const Wall1 = () => {
         {/* Arrow Navigation Indicators */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
           <div
+            data-testid="left-arrow"
             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
             onClick={() => navigateToWall('left')}
           >
@@ -363,6 +365,7 @@ const Wall1 = () => {
 
         <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
           <div
+            data-testid="right-arrow"
             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
             onClick={() => navigateToWall('right')}
           >
@@ -510,7 +513,7 @@ const Wall1 = () => {
                   </div>
                 ))}
               </div>
-              
+
               {/* Second row - remaining digits if more than 6 */}
               {(wall4code?.length > 6) && (
                 <div className="flex justify-center">
@@ -529,8 +532,8 @@ const Wall1 = () => {
               <button
                 key={btn}
                 className={`w-12 h-12 rounded-full font-mono text-xl flex items-center justify-center hover:opacity-80 active:opacity-60
-                  ${typeof btn === 'number' 
-                    ? 'bg-gray-800 text-blue-300 border border-blue-400' 
+                  ${typeof btn === 'number'
+                    ? 'bg-gray-800 text-blue-300 border border-blue-400'
                     : btn === 'C'
                       ? 'bg-red-900 text-red-300 border border-red-500'
                       : 'bg-green-900 text-green-300 border border-green-500'
@@ -557,7 +560,7 @@ const Wall1 = () => {
             Cancel
           </button>
         </div>
-      )},
+      )}
     </div>
   );
 };

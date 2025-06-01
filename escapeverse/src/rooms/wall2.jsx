@@ -114,6 +114,7 @@ const Wall2 = () => {
                     {/* Left Arrow Navigation Indicator */}
                     <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-10">
                         <div
+                            data-testid="left-arrow"
                             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
                             onClick={() => navigate('/wall3')}
                         >
@@ -126,6 +127,7 @@ const Wall2 = () => {
                     {/* Right Arrow Navigation */}
                     <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-10">
                         <div
+                            data-testid="right-arrow"
                             className="w-16 h-16 bg-gray-800 bg-opacity-70 rounded-full flex items-center justify-center cursor-pointer hover:bg-opacity-90 transition-all"
                             onClick={() => navigate('/wall1')}
                         >
@@ -157,18 +159,22 @@ const Wall2 = () => {
                     )}
 
                     {/* Computer Screen Component */}
-                    <ComputerScreen
-                        isOpen={showComputer}
-                        onClose={handleCloseComputer}
-                    />
+                    <div data-testid="computer-screen-root">
+                        <ComputerScreen
+                            isOpen={showComputer}
+                            onClose={handleCloseComputer}
+                        />
+                    </div>
 
                     {/* Wire Puzzle Component */}
-                    {showWirePuzzle && (
-                        <WirePuzzle
-                            onComplete={handlePuzzleComplete}
-                            onClose={() => setShowWirePuzzle(false)}
-                        />
-                    )}
+                    <div data-testid="wire-puzzle-root">
+                        {showWirePuzzle && (
+                            <WirePuzzle
+                                onComplete={handlePuzzleComplete}
+                                onClose={() => setShowWirePuzzle(false)}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
