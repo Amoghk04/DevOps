@@ -21,7 +21,7 @@ jest.mock('../InteractiveImageMap', () => (props) => (
 jest.mock('../rooms/tech/Component/ComputerScreen', () => (props) =>
   props.isOpen ? <div data-testid="computer-screen-root" /> : null
 );
-jest.mock('../rooms/tech/Component/WirePuzzle', () => (props) =>
+jest.mock('../rooms/tech/Component/WirePuzzle', () => () =>
   <div data-testid="wire-puzzle-root" />
 );
 
