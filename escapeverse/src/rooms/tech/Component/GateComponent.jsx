@@ -6,8 +6,6 @@ const GateComponent = ({ gatePositions, onGateClick }) => {
   const [activeGate, setActiveGate] = useState(null);
   const gateOverlayRef = useRef(null);
   const { 
-    playGateSolveSound,
-    updateGateSolved,
     getOrCreateCircuit 
   } = useGame();
 
