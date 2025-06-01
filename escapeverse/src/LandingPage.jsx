@@ -130,12 +130,13 @@ export default function LandingPage() {
                 aria-label={`${username}'s profile picture`}
               >
                 <div
-                  className="absolute w-full h-full bg-cover"
-                  style={{
-                    backgroundImage: "url('profile1.png')",
-                    backgroundSize: "300% 300%",
-                    backgroundPosition: `${getIconPosition(profileIndex).x} ${getIconPosition(profileIndex).y}`
-                  }}
+                    className="absolute w-full h-full bg-cover"
+                    style={{
+                        backgroundImage: "url('profile1.png')",
+                        backgroundSize: "300% 300%",
+                        backgroundPosition: `${getIconPosition(profileIndex).x} ${getIconPosition(profileIndex).y}`
+                    }}
+                    aria-hidden="true"
                 />
               </div>
               <div>

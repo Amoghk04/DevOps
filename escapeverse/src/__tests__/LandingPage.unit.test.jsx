@@ -280,15 +280,23 @@ describe('LandingPage Component', () => {
 
   test('applies correct profile icon positioning', async () => {
     mockLocalStorage.getItem.mockImplementation((key) => {
-      if (key === 'profileIndex') return '4'; // This should map to position 1,1
-      return null;
+        if (key === 'profileIndex') return '4'; // This should map to position 1,1
+        return null;
     });
 
     renderWithProviders(<LandingPage />);
 
     await waitFor(() => {
-      const profileIcon = screen.getByLabelText('Profile Icon');
-      expect(profileIcon).toBeInTheDocument();
+        const profileIcon = screen.getByRole('img', { 
+            name: /Guest's profile picture/i 
+        });
+        expect(profileIcon).toBeInTheDocument();
+        
+        // Check if the background position is correct for index 4
+        const backgroundDiv = profileIcon.querySelector('.bg-cover');
+        expect(backgroundDiv).toHaveStyle({
+            backgroundPosition: '50% 50%'
+        });
     });
   });
 

@@ -7,7 +7,7 @@ import RoomLobby from "../RoomLobby";
 
 expect.extend(toHaveNoViolations);
 
-const renderWithContext = (isHost = false) => {
+const renderWithContext = () => {
   const mockUser = { displayName: "TestUser" };
   return render(
     <UserContext.Provider value={{ user: mockUser }}>
