@@ -25,4 +25,4 @@ jobs:
           ssh gcp-vm << 'EOF'
             cd /home/dbproject1234567890/DevOps
             git pull origin main
-          EOF
+          EOF 
