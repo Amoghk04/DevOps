@@ -6,8 +6,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import codeVerificationRouter from './routes/codeVerification.js';
 
-
-// Configure dotenv before using process.env
 dotenv.config({ path: './.env' })
 
 const app = express();

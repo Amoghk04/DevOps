@@ -18,6 +18,11 @@ const renderWithContext = () => {
   );
 };
 
+jest.mock('../config', () => ({
+  __esModule: true,
+  default: { apiUrl: 'http://localhost:3001' }
+}));
+
 describe("Accessibility tests for RoomLobby", () => {
   it("should have no accessibility violations", async () => {
     const mockUser = { displayName: "TestUser" };

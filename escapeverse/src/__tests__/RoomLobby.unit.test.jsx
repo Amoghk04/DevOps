@@ -390,3 +390,8 @@ describe("RoomLobby", () => {
     });
   });
 });
+
+jest.mock('../config', () => ({
+  __esModule: true,
+  default: { apiUrl: 'http://localhost:3001' }
+}));
